@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syndic - Andalous Al Rahma 4</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries for Excel & PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
@@ -24,6 +27,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
+    <!-- ================= LOGIN SCREEN ================= -->
     <div id="login-screen" class="flex items-center justify-center min-h-screen px-4 bg-slate-900">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <h1 class="text-xl font-bold text-center text-slate-900 mb-6">Syndic Application</h1>
@@ -36,6 +40,7 @@
         </div>
     </div>
 
+    <!-- ================= MAIN APP SCREEN ================= -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col">
         <header class="bg-white border-b border-slate-200 h-14 flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
             <div class="flex items-center space-x-2">
@@ -50,6 +55,7 @@
 
         <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
             
+            <!-- ================= TABLEAU DE BORD (Original Classic Layout) ================= -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -74,6 +80,7 @@
                 </div>
             </div>
 
+            <!-- Action Toolbar -->
             <div class="flex flex-wrap gap-2 justify-end bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
                 <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center shadow-sm">
                     <i class="fa-solid fa-file-excel mr-1.5"></i> Charger EXCEL
@@ -83,11 +90,12 @@
                 <button onclick="generatePDFReport()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm"><i class="fa-solid fa-file-pdf mr-1.5"></i>Générer PDF Pro</button>
             </div>
 
+            <!-- ================= PAGE 1 : COTISATIONS (Multi-Select Dots Form) ================= -->
             <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden accordion-item" id="sec-cotisations">
                 <button onclick="toggleAccordion('sec-cotisations')" class="w-full flex items-center justify-between p-4 font-bold text-left bg-slate-50 hover:bg-slate-100/50 transition-colors text-slate-800 border-b border-slate-200">
                     <span class="flex items-center text-sm"><i class="fa-solid fa-hand-holding-dollar text-emerald-600 mr-2"></i>PAGE I : Gestion des Cotisations (المداخيل المباشرة)</span>
                     <div class="flex items-center space-x-4" onclick="event.stopPropagation()">
-                        <select id="matrix-year" class="text-xs bg-white border border-slate-300 rounded p-1 font-normal" onchange="renderIncomesTable()">
+                        <select id="matrix-year" class="text-xs bg-white border border-slate-300 rounded p-1 font-normal" onchange="renderIncomesTable(); updateStatsAndTables();">
                             <option value="2024">2024</option><option value="2025">2025</option>
                             <option value="2026" selected>2026</option><option value="2027">2027</option>
                         </select>
@@ -95,6 +103,7 @@
                     </div>
                 </button>
                 <div class="accordion-content bg-white p-4 space-y-4">
+                    <!-- Formulaire Compact de Saisie Rapide (Multi-select Dots) -->
                     <form id="income-form" onsubmit="saveIncome(event)" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                         <input type="hidden" id="income-edit-appt" value="-1">
                         <div class="flex flex-wrap items-center gap-4">
@@ -104,8 +113,7 @@
                             </div>
                             <div class="flex-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner les mois payés (نقاط اختيار الشهور المستلمة)</label>
-                                <div class="flex flex-wrap gap-2 mt-1" id="dots-months-container">
-                                    </div>
+                                <div class="flex flex-wrap gap-2 mt-1" id="dots-months-container"></div>
                             </div>
                             <div class="w-32 pt-5">
                                 <button type="submit" id="btn-sub-inc" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"><i class="fa-solid fa-check mr-1"></i>Enregistrer</button>
@@ -113,6 +121,7 @@
                         </div>
                     </form>
 
+                    <!-- Real-time View List Table -->
                     <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
                         <table class="w-full text-left border-collapse" id="table-incomes">
                             <thead class="bg-slate-100 font-bold border-b border-slate-200 text-slate-700 uppercase">
@@ -124,6 +133,7 @@
                 </div>
             </div>
 
+            <!-- ================= PAGE 2 : DEPENSES ================= -->
             <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden accordion-item" id="sec-depenses">
                 <button onclick="toggleAccordion('sec-depenses')" class="w-full flex items-center justify-between p-4 font-bold text-left bg-slate-50 hover:bg-slate-100/50 transition-colors text-slate-800 border-b border-slate-200">
                     <span class="flex items-center text-sm"><i class="fa-solid fa-receipt text-rose-600 mr-2"></i>PAGE II : Registre des Dépenses (المصاريف)</span>
@@ -153,6 +163,7 @@
                         </div>
                     </form>
 
+                    <!-- Expenses Table -->
                     <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
                         <table class="w-full text-left border-collapse" id="table-expenses">
                             <thead class="bg-slate-100 font-bold text-slate-700 uppercase">
@@ -172,6 +183,7 @@
         </main>
     </div>
 
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         const MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
         const SERVICES_KEYS = [
@@ -181,7 +193,6 @@
             { id: "ext", label: "Balayage" }
         ];
         
-        // Comprehensive Core Memory Bank Store
         let db = { incomes: {}, expenses: [] };
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -201,7 +212,6 @@
             const expY = document.getElementById("exp-year");
             [2024, 2025, 2026, 2027].forEach(y => expY.innerHTML += `<option value="${y}">${y}</option>`);
 
-            // Build Selection Dots Form
             const dotsContainer = document.getElementById("dots-months-container");
             MONTHS.forEach((m, idx) => {
                 dotsContainer.innerHTML += `
@@ -212,7 +222,6 @@
                 `;
             });
 
-            // Build dynamic income table header
             const hRow = document.getElementById("table-inc-head");
             hRow.innerHTML = '<th class="p-2.5">Désignation</th>';
             MONTHS.forEach(m => hRow.innerHTML += `<th class="p-2.5 text-center">${m.substring(0,4)}.</th>`);
@@ -236,34 +245,30 @@
             if(!db.incomes[yr]) {
                 db.incomes[yr] = {};
                 for(let i=1; i<=25; i++) {
-                    db.incomes[yr][i] = Array(12).fill(null); // null = Non saisi (futur)
+                    db.incomes[yr][i] = Array(12).fill(null);
                 }
             }
         }
 
-        // --- TIME ENGINE COMPLIANCE ---
         function getMonthStatus(apptValue, monthIdx, selectedYear) {
-            const now = new Date(); // Dynamic operational reference context (June 2026)
+            const now = new Date();
             const currentYear = now.getFullYear();
             const currentMonthIdx = now.getMonth();
 
             if (apptValue === 50) return { label: "50.00 DH", color: "text-emerald-600 font-bold" };
-
-            // Future evaluations engine checks
             if (selectedYear > currentYear || (selectedYear === currentYear && monthIdx > currentMonthIdx)) {
                 return { label: "-", color: "text-slate-300 text-center" };
             }
             return { label: "0.00 DH", color: "text-amber-600 font-medium" };
         }
 
-        // --- PAGE I : CORE LOGIC FOR INCOME ---
+        // --- PAGE I : INCOMES ---
         function saveIncome(e) {
             e.preventDefault();
             checkAndBuildYearDatabase();
             const yr = document.getElementById("matrix-year").value;
             const appt = parseInt(document.getElementById("inc-appt").value);
             
-            // Gather selected month indexes from input checkboxes
             let selectedMonths = [];
             document.querySelectorAll(".form-dot-chk:checked").forEach(chk => {
                 selectedMonths.push(parseInt(chk.value));
@@ -273,12 +278,10 @@
             const currentYear = now.getFullYear();
             const currentMonthIdx = now.getMonth();
 
-            // Loop 12 months to automatically set status
             for(let mIdx=0; mIdx<12; mIdx++) {
                 if(selectedMonths.includes(mIdx)) {
                     db.incomes[yr][appt][mIdx] = 50;
                 } else {
-                    // Past or current month becomes 0, future months remain untouched (null)
                     if(parseInt(yr) < currentYear || (parseInt(yr) === currentYear && mIdx <= currentMonthIdx)) {
                         db.incomes[yr][appt][mIdx] = 0;
                     } else {
@@ -290,17 +293,13 @@
             updateStatsAndTables();
             renderIncomesTable();
             document.getElementById("income-form").reset();
-            document.getElementById("income-edit-appt").value = "-1";
-            document.getElementById("btn-sub-inc").innerHTML = '<i class="fa-solid fa-check mr-1"></i>Enregistrer';
         }
 
         function editIncome(appt) {
             checkAndBuildYearDatabase();
             const yr = document.getElementById("matrix-year").value;
             document.getElementById("inc-appt").value = appt;
-            document.getElementById("income-edit-appt").value = appt;
             
-            // Re-check input checkboxes based on values array
             document.querySelectorAll(".form-dot-chk").forEach((chk, mIdx) => {
                 chk.checked = db.incomes[yr][appt][mIdx] === 50;
             });
@@ -310,7 +309,7 @@
         }
 
         function deleteIncome(appt) {
-            if(confirm(`Voulez-vous réinitialiser l'historique de l'appartement ${appt} pour cette année ?`)) {
+            if(confirm(`Réinitialiser l'appartement ${appt} ?`)) {
                 const yr = document.getElementById("matrix-year").value;
                 db.incomes[yr][appt] = Array(12).fill(null);
                 updateStatsAndTables();
@@ -339,8 +338,8 @@
                 rowHTML += `
                     <td class="p-2.5 text-right font-bold text-blue-600">${rowSum.toFixed(2)} DH</td>
                     <td class="p-2.5 text-center space-x-2">
-                        <button onclick="editIncome(${app})" class="text-blue-500 hover:text-blue-700 text-xs" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteIncome(${app})" class="text-red-400 hover:text-red-600 text-xs" title="Vider"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="editIncome(${app})" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteIncome(${app})" class="text-red-400 hover:text-red-600 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                     </td>
                 </tr>`;
                 tbody.innerHTML += rowHTML;
@@ -380,7 +379,7 @@
             document.getElementById("exp-month").value = ex.month;
             document.getElementById("exp-year").value = ex.year;
             SERVICES_KEYS.forEach(s => {
-                let val = ex.services[s.id];
+                let val = ex.services[s.id] || 0;
                 document.getElementById(`chk-${s.id}`).checked = val > 0;
                 document.getElementById(`amt-${s.id}`).disabled = val === 0;
                 document.getElementById(`amt-${s.id}`).value = val > 0 ? val : '';
@@ -393,24 +392,26 @@
 
         function deleteExpense(idx) { if(confirm("Supprimer ce frais ?")) { db.expenses.splice(idx, 1); updateStatsAndTables(); } }
 
-        // --- REFRESH STATISTICS ENGINE ---
+        // --- STATS REFRESH ---
         function updateStatsAndTables() {
+            const yr = document.getElementById("matrix-year").value;
             let totalIn = 0;
-            Object.values(db.incomes).forEach(yearObj => {
-                Object.values(yearObj).forEach(arr => {
+            if(db.incomes[yr]) {
+                Object.values(db.incomes[yr]).forEach(arr => {
                     arr.forEach(v => { if(v === 50) totalIn += 50; });
                 });
-            });
-            let totalOut = db.expenses.reduce((sum, item) => sum + item.total, 0);
+            }
+            
+            let totalOut = db.expenses.filter(e => e.year == yr).reduce((sum, item) => sum + item.total, 0);
             
             document.getElementById("dash-total-incomes").innerText = `${totalIn.toFixed(2)} DH`;
             document.getElementById("dash-total-expenses").innerText = `${totalOut.toFixed(2)} DH`;
             document.getElementById("dash-balance").innerText = `${(totalIn - totalOut).toFixed(2)} DH`;
 
-            // Render Expenses Table
+            // Table Expenses Render
             const tbodyExp = document.querySelector("#table-expenses tbody");
             tbodyExp.innerHTML = "";
-            db.expenses.forEach((e, idx) => {
+            db.expenses.filter(e => e.year == yr).forEach((e, idx) => {
                 let details = Object.entries(e.services).map(([k,v]) => `${k}:${v}DH`).join(' | ');
                 tbodyExp.innerHTML += `<tr>
                     <td class="p-2.5 font-bold text-slate-900">${e.month} ${e.year}</td>
@@ -442,56 +443,111 @@
         }
         function handleLogout() { document.getElementById("app-screen").classList.add("hidden"); document.getElementById("login-screen").classList.remove("hidden"); }
 
-        // ================= CONFORMAL FILE EXPORTS (EXCEL COMPLIANCE) =================
+        // ================= EXPORT SYSTEM (EXCEL FIX) =================
         function exportToExcel() {
             let wb = XLSX.utils.book_new();
             const yr = document.getElementById("matrix-year").value;
 
-            // Strict Header layout specifications mapping requirements
+            // Sheet 1: Incomes
             let aoaData = [
                 [`SOCIETE COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - ANNEE ${yr}`],
                 ["Appartement (A)", ...MONTHS, "Total Annuel (DH)"]
             ];
-
             let monthlySums = Array(12).fill(0);
-
             for(let app=1; app<=25; app++) {
                 let row = [`Appartement ${app}`];
                 let appSum = 0;
                 for(let mIdx=0; mIdx<12; mIdx++) {
                     let val = db.incomes[yr][app][mIdx];
-                    if(val === 50) {
-                        row.push(50.00); appSum += 50; monthlySums[mIdx] += 50;
-                    } else if(val === 0) {
-                        row.push(0.00);
-                    } else {
-                        row.push("-");
-                    }
+                    if(val === 50) { row.push(50.00); appSum += 50; monthlySums[mIdx] += 50; }
+                    else if(val === 0) { row.push(0.00); }
+                    else { row.push("-"); }
                 }
                 row.push(appSum);
                 aoaData.push(row);
             }
             aoaData.push(["Total Mensuel", ...monthlySums, monthlySums.reduce((a,b)=>a+b,0)]);
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoaData), "Cotisations");
 
-            let ws = XLSX.utils.aoa_to_sheet(aoaData);
-            XLSX.utils.book_append_sheet(wb, ws, `Cotisations ${yr}`);
+            // Sheet 2: Expenses (FIXED KEYS)
+            let expRows = [["Mois", "Année", "Électricité", "Nettoyage", "Produits", "Balayage", "Montant Exceptionnel", "Nature Frais", "Total Mensuel (DH)"]];
+            db.expenses.filter(e => e.year == yr).forEach(e => {
+                expRows.push([
+                    e.month, e.year, 
+                    e.services.elec || 0, e.services.clean || 0, e.services.prod || 0, e.services.ext || 0, 
+                    e.special.amt || 0, e.special.type || "-", e.total || 0
+                ]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(expRows), "Dépenses");
+
             XLSX.writeFile(wb, `Registre_Syndic_Andalous4_${yr}.xlsx`);
         }
 
-        // ================= PROFESSIONAL PDF REPORTING ENGINE (WITH COLORS) =================
+        // ================= IMPORT SYSTEM (FULL RESTORATION FIX) =================
+        function importFromExcel(e) {
+            let file = e.target.files[0]; if (!file) return;
+            let reader = new FileReader(); reader.readAsArrayBuffer(file);
+            reader.onload = function(evt) {
+                try {
+                    let data = new Uint8Array(evt.target.result);
+                    let workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const yr = document.getElementById("matrix-year").value;
+                    if(!db.incomes[yr]) db.incomes[yr] = {};
+
+                    // Read Sheet 1 (Incomes)
+                    let sheet1 = workbook.Sheets["Cotisations"];
+                    if(sheet1) {
+                        let rows = XLSX.utils.sheet_to_json(sheet1, { header: 1 });
+                        for(let i=2; i<=26; i++) {
+                            let r = rows[i]; if(!r) continue;
+                            let appNum = parseInt(r[0].replace(/[^0-9]/g, ''));
+                            if(!appNum) continue;
+
+                            db.incomes[yr][appNum] = Array(12).fill(null);
+                            for(let mIdx=0; mIdx<12; mIdx++) {
+                                let cellVal = r[mIdx+1];
+                                if(cellVal === 50 || cellVal === "50") db.incomes[yr][appNum][mIdx] = 50;
+                                else if(cellVal === 0 || cellVal === "0" || cellVal === "00,00") db.incomes[yr][appNum][mIdx] = 0;
+                            }
+                        }
+                    }
+
+                    // Read Sheet 2 (Expenses Restoration)
+                    let sheet2 = workbook.Sheets["Dépenses"];
+                    if(sheet2) {
+                        let rows = XLSX.utils.sheet_to_json(sheet2, { header: 1 });
+                        db.expenses = db.expenses.filter(e => e.year != yr); // Clear dynamic current year block
+                        for(let i=1; i<rows.length; i++) {
+                            let r = rows[i]; if(!r || !r[0]) continue;
+                            db.expenses.push({
+                                month: r[0], year: parseInt(r[1]),
+                                services: { elec: parseFloat(r[2])||0, clean: parseFloat(r[3])||0, prod: parseFloat(r[4])||0, ext: parseFloat(r[5])||0 },
+                                special: { amt: parseFloat(r[6])||0, type: r[7] || "-" }, total: parseFloat(r[8])||0
+                            });
+                        }
+                    }
+
+                    renderIncomesTable(); 
+                    updateStatsAndTables(); 
+                    alert("Base de données synchronisée (Madahel & Masarif) !");
+                } catch(err) { alert("Format invalide."); }
+            };
+        }
+
+        // ================= PDF REPORT GENERATOR =================
         function generatePDFReport() {
             const { jsPDF } = window.jspdf;
-            let doc = new jsPDF('l', 'mm', 'a4'); // Landscape for 12 months spreadsheet formatting
+            let doc = new jsPDF('l', 'mm', 'a4'); 
             const yr = document.getElementById("matrix-year").value;
 
-            // Clean corporate top ribbon branding bar
+            // Page I : Incomes Spreadsheet
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(12); doc.setFont("Helvetica", "bold");
             doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
 
-            // Document Content Meta Description
             doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-            doc.text("PAGE I : SUIVI DE VENTILATION DES COTISATIONS MENSUELLES DIRECTES", 12, 26);
+            doc.text("PAGE I : SUIVI DE VENTILATION DES COTISATIONS MENSUELLES DIRECTES (MADAHEL)", 12, 26);
 
             let pdfHeaders = ["Appartement", ...MONTHS.map(m=>m.substring(0,4)+'.'), "Total (DH)"];
             let pdfRows = [];
@@ -501,7 +557,7 @@
                 let row = [`Appartement ${app}`];
                 let appSum = 0;
                 for(let mIdx=0; mIdx<12; mIdx++) {
-                    let val = db.incomes[yr][app][mIdx];
+                    let val = db.incomes[yr]?.[app]?.[mIdx];
                     if(val === 50) { row.push("50,00"); appSum += 50; monthlySums[mIdx] += 50; }
                     else if(val === 0) { row.push("00,00"); }
                     else { row.push("-"); }
@@ -509,57 +565,48 @@
                 row.push(`${appSum.toFixed(2)} DH`);
                 pdfRows.push(row);
             }
-            // Push bottom sums row
             pdfRows.push(["Total Mensuel", ...monthlySums.map(v=>`${v.toFixed(2)} DH`), `${monthlySums.reduce((a,b)=>a+b,0).toFixed(2)} DH`]);
 
             doc.autoTable({
-                startY: 30,
-                head: [pdfHeaders],
-                body: pdfRows,
+                startY: 30, head: [pdfHeaders], body: pdfRows,
                 styles: { fontSize: 7, cellPadding: 1.5, alignment: 'center' },
-                headStyles: { fillColor: [37, 99, 235] },
-                theme: 'grid',
+                headStyles: { fillColor: [37, 99, 235] }, theme: 'grid',
                 didParseCell: function(data) {
-                    // Styles logic processing block execution
                     if (data.row.index === pdfRows.length - 1) {
                         data.cell.styles.fontStyle = 'bold';
                         data.cell.styles.fillColor = [241, 245, 249];
                         return;
                     }
-                    
-                    // Extract row total string to confirm 0.00 DH total annual default
                     let totalStr = pdfRows[data.row.index][13];
                     if(totalStr === "0.00 DH") {
-                        // Light pastel red background for non-contributing total annual defaults
                         data.cell.styles.fillColor = [254, 226, 226]; 
                         data.cell.styles.textColor = [153, 27, 27];
                         return;
                     }
-
                     let txt = data.cell.text[0];
                     if(txt === "50,00") {
-                        data.cell.styles.fillColor = [220, 252, 231]; // Light green pastel
+                        data.cell.styles.fillColor = [220, 252, 231]; 
                         data.cell.styles.textColor = [21, 128, 61];
                         data.cell.styles.fontStyle = 'bold';
                     } else if(txt === "00,00") {
-                        data.cell.styles.fillColor = [255, 237, 213]; // Light orange pastel
+                        data.cell.styles.fillColor = [255, 237, 213]; 
                         data.cell.styles.textColor = [194, 65, 12];
                     }
                 }
             });
 
-            // Page II : Expenses Log Rendering
+            // Page II : Expenses Spreadsheet
             doc.addPage();
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(12);
             doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
             
             doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-            doc.text("PAGE II : REGISTRE DE COMPTABILITE DES CHARGES & DEPENSES EFFECTIVES", 12, 26);
+            doc.text("PAGE II : REGISTRE DE COMPTABILITE DES CHARGES & DEPENSES EFFECTIVES (MASARIF)", 12, 26);
 
             let expRows = db.expenses.filter(e => e.year == yr).map(e => {
-                let details = `Elec: ${e.services.elec}DH | Prods: ${e.services.products}DH | Nettoyage: ${e.services.clean}DH`;
-                return [`${e.month} ${e.year}`, details, `${e.special.amt} DH (${e.special.type})`, `${e.total.toFixed(2)} DH`];
+                let details = `Électricité: ${e.services.elec || 0}DH | Prods: ${e.services.prod || 0}DH | Nettoyage: ${e.services.clean || 0}DH | Balayage: ${e.services.ext || 0}DH`;
+                return [`${e.month} ${e.year}`, details, `${e.special.amt || 0} DH (${e.special.type || '-'})`, `${e.total.toFixed(2)} DH`];
             });
 
             doc.autoTable({
@@ -570,39 +617,6 @@
             });
 
             doc.save(`Rapport_Syndic_Andalous4_${yr}.pdf`);
-        }
-
-        // ================= REVERSE INGESTION INTERACTION =================
-        function importFromExcel(e) {
-            let file = e.target.files[0]; if (!file) return;
-            let reader = new FileReader(); reader.readAsArrayBuffer(file);
-            reader.onload = function(evt) {
-                try {
-                    let data = new Uint8Array(evt.target.result);
-                    let workbook = XLSX.read(data, { type: 'array' });
-                    db.incomes = {};
-
-                    workbook.SheetNames.forEach(sheetName => {
-                        let rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-                        let yr = parseInt(sheetName.replace(/[^0-9]/g, '')) || 2026;
-                        if(!db.incomes[yr]) db.incomes[yr] = {};
-
-                        for(let i=2; i<=26; i++) {
-                            let r = rows[i]; if(!r) continue;
-                            let appNum = parseInt(r[0].replace(/[^0-9]/g, ''));
-                            if(!appNum) continue;
-
-                            db.incomes[yr][appNum] = Array(12).fill(null);
-                            for(let mIdx=0; mIdx<12; mIdx++) {
-                                let cellVal = r[mIdx+1];
-                                if(cellVal === 50) db.incomes[yr][appNum][mIdx] = 50;
-                                else if(cellVal === 0) db.incomes[yr][appNum][mIdx] = 0;
-                            }
-                        }
-                    });
-                    renderIncomesTable(); updateStatsAndTables(); alert("Importation complétée !");
-                } catch(err) { alert("Format invalide."); }
-            };
         }
     </script>
 </body>
