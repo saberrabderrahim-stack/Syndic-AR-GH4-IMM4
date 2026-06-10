@@ -1,677 +1,1088 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syndic - Andalous Al Rahma 4</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Libraries for Excel & PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .accordion-open .accordion-content {
-            max-height: 2500px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Syndic · AR4</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;-webkit-text-size-adjust:100%;}
+body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:#1e293b;height:100%;overflow:hidden;overscroll-behavior:none;}
+
+:root{
+  --blue:#2563eb;--blue-l:#eff6ff;--blue-d:#1d4ed8;
+  --green:#059669;--green-l:#ecfdf5;
+  --red:#dc2626;--red-l:#fef2f2;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --violet:#7c3aed;--violet-l:#f5f3ff;
+  --cyan:#0891b2;--cyan-l:#ecfeff;
+  --gray:#64748b;--border:#e2e8f0;
+  --hdr:56px;--nav:68px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,16px);
+}
+
+/* ======= LOGIN ======= */
+#login-screen{
+  position:fixed;inset:0;z-index:999;
+  background:linear-gradient(160deg,#0f172a 0%,#1a3055 55%,#0f172a 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;padding-top:calc(20px + var(--safe-top));
+}
+#login-screen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(37,99,235,.28),transparent 65%);
+  pointer-events:none;
+}
+.lcard{
+  width:100%;max-width:400px;position:relative;z-index:2;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.13);border-radius:28px;
+  padding:36px 28px 32px;
+  box-shadow:0 24px 64px rgba(0,0,0,.55);
+}
+.llogo{
+  width:88px;height:88px;border-radius:50%;margin:0 auto 22px;
+  background:linear-gradient(135deg,rgba(37,99,235,.55),rgba(16,185,129,.45));
+  border:2px solid rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 36px rgba(37,99,235,.45),inset 0 0 20px rgba(255,255,255,.05);
+}
+.llogo svg{width:52px;height:52px;}
+.ltitle{text-align:center;color:#fff;font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-.3px;}
+.lsub{text-align:center;color:rgba(255,255,255,.38);font-size:12px;margin-bottom:26px;}
+.linput{
+  width:100%;padding:15px 48px 15px 16px;
+  background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.15);
+  border-radius:14px;color:#fff;font-size:16px;font-family:'Cairo',sans-serif;outline:none;
+  transition:.2s;margin-bottom:12px;
+  -webkit-appearance:none;
+}
+.linput::placeholder{color:rgba(255,255,255,.3);}
+.linput:focus{border-color:rgba(99,153,255,.8);background:rgba(255,255,255,.13);}
+.linput-wrap{position:relative;}
+.linput-wrap .eyebtn{position:absolute;right:14px;top:50%;transform:translateY(-60%);background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:16px;padding:6px;touch-action:manipulation;}
+.lerr{display:none;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:12px;color:#fca5a5;font-size:13px;padding:12px;text-align:center;margin-bottom:12px;}
+.lbtn{
+  width:100%;padding:16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  border:none;border-radius:14px;color:#fff;font-weight:900;font-size:16px;
+  font-family:'Cairo',sans-serif;cursor:pointer;margin-top:6px;
+  box-shadow:0 6px 24px rgba(37,99,235,.55);transition:.15s;
+  touch-action:manipulation;
+}
+.lbtn:active{transform:scale(.97);box-shadow:0 3px 12px rgba(37,99,235,.4);}
+.lfooter{text-align:center;margin-top:20px;color:rgba(255,255,255,.18);font-size:11px;}
+
+/* ======= APP SHELL ======= */
+#app{position:fixed;inset:0;display:none;flex-direction:column;}
+
+/* ======= HEADER ======= */
+#hdr{
+  flex-shrink:0;
+  background:#0f172a;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 16px 10px;
+  padding-top:calc(10px + var(--safe-top));
+  box-shadow:0 2px 16px rgba(0,0,0,.35);
+  z-index:100;position:relative;
+}
+.hlogo{display:flex;align-items:center;gap:10px;}
+.hicon{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#2563eb,#059669);display:flex;align-items:center;justify-content:center;}
+.hicon svg{width:24px;height:24px;}
+.htitle{color:#fff;font-weight:900;font-size:14px;line-height:1.2;}
+.hsub{color:rgba(255,255,255,.38);font-size:10px;font-weight:500;}
+.hright{display:flex;align-items:center;gap:8px;}
+.huser{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.11);border-radius:8px;padding:6px 10px;}
+.huser i{color:#60a5fa;font-size:11px;}
+.huser span{color:#fff;font-size:11px;font-weight:700;}
+.hlogout{background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.3);color:#f87171;border-radius:8px;padding:8px 10px;cursor:pointer;font-size:13px;touch-action:manipulation;}
+
+/* ======= SCROLL ======= */
+#scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:14px 14px calc(var(--nav) + var(--safe-bot) + 8px);
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ======= BOTTOM NAV ======= */
+#nav{
+  position:fixed;bottom:0;left:0;right:0;
+  padding-bottom:var(--safe-bot);
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;z-index:200;
+  box-shadow:0 -4px 24px rgba(0,0,0,.1);
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:none;cursor:pointer;
+  color:#94a3b8;transition:.15s;padding:10px 4px 6px;
+  position:relative;touch-action:manipulation;
+  min-height:60px;
+}
+.nb i{font-size:20px;transition:.15s;}
+.nb span{font-size:10px;font-weight:700;line-height:1;}
+.nb.on{color:var(--blue);}
+.nb.on-g{color:var(--green);}
+.nb.on-r{color:var(--red);}
+.nb.on-v{color:var(--violet);}
+.nb.on::before,.nb.on-g::before,.nb.on-r::before,.nb.on-v::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:3px;border-radius:0 0 4px 4px;
+}
+.nb.on::before{background:var(--blue);}
+.nb.on-g::before{background:var(--green);}
+.nb.on-r::before{background:var(--red);}
+.nb.on-v::before{background:var(--violet);}
+
+/* ======= PANELS ======= */
+.panel{display:none;animation:pu .22s ease;}
+.panel.on{display:block;}
+@keyframes pu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ======= CARDS ======= */
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.card-title{font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+/* ======= STAT GRID ======= */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.scard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.scard.full{grid-column:1/-1;}
+.sicon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.slbl{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.sval{font-size:20px;font-weight:900;line-height:1;}
+
+/* ======= FORM ======= */
+.flbl{display:block;font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.finput{
+  width:100%;padding:13px 14px;background:#f8fafc;border:1.5px solid var(--border);
+  border-radius:12px;font-size:15px;font-family:'Cairo',sans-serif;outline:none;
+  transition:.2s;color:#1e293b;-webkit-appearance:none;
+}
+.finput:focus{border-color:#3b82f6;background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+.fg{margin-bottom:14px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ======= BUTTONS ======= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 18px;border-radius:12px;font-weight:800;font-size:14px;
+  font-family:'Cairo',sans-serif;border:none;cursor:pointer;transition:.15s;
+  touch-action:manipulation;-webkit-appearance:none;
+}
+.btn:active{transform:scale(.97);}
+.btn-full{width:100%;}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:10px;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:#f1f5f9;color:#475569;border:1px solid var(--border);}
+.btn-del{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+
+/* ======= MONTH GRID ======= */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;}
+.mdot{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 4px;border-radius:11px;border:1.5px solid var(--border);background:#fff;
+  font-size:12px;font-weight:700;color:#64748b;cursor:pointer;user-select:none;
+  transition:.15s;gap:3px;touch-action:manipulation;
+}
+.mdot input{display:none;}
+.mdot i{font-size:10px;color:var(--blue);opacity:0;transition:.15s;}
+.mdot.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue);}
+.mdot.on i{opacity:1;}
+
+/* ======= BADGES ======= */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;white-space:nowrap;}
+.bg{background:var(--green-l);color:#15803d;}
+.br{background:var(--red-l);color:#991b1b;}
+.ba{background:var(--amber-l);color:#92400e;}
+.bs{background:#f1f5f9;color:#64748b;}
+.bv{background:var(--violet-l);color:var(--violet);}
+.bc{background:var(--cyan-l);color:var(--cyan);}
+
+/* ======= APT CARDS ======= */
+.apt-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+.apt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.apt-name{font-weight:900;font-size:15px;display:flex;align-items:center;gap:7px;}
+.apt-num{background:var(--blue-l);color:var(--blue);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}
+.apt-sum{font-weight:900;font-size:15px;color:var(--blue);}
+.apt-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
+.mchip{padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700;}
+.apt-acts{display:flex;gap:8px;padding-top:10px;border-top:1px solid #f1f5f9;}
+
+/* ======= EXPENSE CARDS ======= */
+.exp-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+.exp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.exp-per{font-weight:900;font-size:15px;}
+.exp-tot{font-weight:900;font-size:16px;color:var(--red);}
+.exp-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.exp-acts{display:flex;gap:8px;padding-top:10px;border-top:1px solid #f1f5f9;}
+
+/* ======= SERVICE CARDS ======= */
+.srvgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.srv{
+  background:#f8fafc;border:1.5px solid var(--border);border-radius:13px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;transition:.2s;cursor:pointer;touch-action:manipulation;
+}
+.srv.on{background:var(--blue-l);border-color:var(--blue);}
+.srv-top{display:flex;align-items:center;gap:10px;}
+.srv-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.srv-lbl{font-size:13px;font-weight:700;color:#334155;flex:1;}
+.srv-chk{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0;}
+.srv-amt{width:100%;padding:9px 11px;background:#fff;border:1.5px solid var(--border);border-radius:9px;font-size:14px;text-align:right;font-family:'Cairo',sans-serif;outline:none;-webkit-appearance:none;}
+.srv-amt:disabled{background:#f8fafc;color:#94a3b8;}
+.srv-amt:focus{border-color:var(--blue);}
+
+/* ======= PBAR ======= */
+.pbar{height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;margin-top:7px;}
+.pbar-f{height:100%;border-radius:99px;transition:width .5s;}
+
+/* ======= MONTHLY TABLE ======= */
+.mtbl{width:100%;border-collapse:collapse;font-size:13px;}
+.mtbl th{padding:10px 12px;text-align:left;font-weight:800;font-size:10px;text-transform:uppercase;color:var(--gray);border-bottom:2px solid var(--border);white-space:nowrap;}
+.mtbl td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.mtbl tbody tr:last-child td{border-bottom:none;}
+
+/* ======= YEAR PILL ======= */
+.ypill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 13px;}
+.ypill i{color:var(--blue);font-size:12px;}
+.ypill select{background:none;border:none;outline:none;font-size:14px;font-weight:800;color:#1e293b;font-family:'Cairo',sans-serif;cursor:pointer;-webkit-appearance:none;}
+
+/* ======= EXPORT CARDS ======= */
+.excard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px;}
+.excard-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.excard-ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.excard-t{font-weight:900;font-size:15px;margin-bottom:2px;}
+.excard-s{font-size:12px;color:var(--gray);}
+.upzone{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  padding:22px;background:var(--amber-l);border:2px dashed #fde68a;border-radius:13px;
+  cursor:pointer;transition:.2s;touch-action:manipulation;
+}
+.upzone:active{background:#fef3c7;}
+.upzone i{font-size:26px;color:var(--amber);}
+.upzone span{font-size:14px;font-weight:800;color:var(--amber);}
+
+/* ======= TOAST ======= */
+#toast{
+  position:fixed;bottom:calc(var(--nav) + var(--safe-bot) + 12px);left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1e293b;color:#fff;padding:12px 22px;border-radius:14px;
+  font-size:14px;font-weight:700;z-index:9999;
+  opacity:0;transition:.25s;white-space:nowrap;
+  display:flex;align-items:center;gap:9px;
+  box-shadow:0 8px 28px rgba(0,0,0,.35);pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.ok{border-left:4px solid var(--green);}
+#toast.err{border-left:4px solid var(--red);}
+
+/* ======= EMPTY ======= */
+.empty{text-align:center;padding:48px 20px;color:#94a3b8;}
+.empty i{font-size:38px;display:block;margin-bottom:12px;}
+.empty p{font-size:14px;font-weight:600;}
+
+/* ======= DESKTOP ======= */
+@media(min-width:640px){
+  .sgrid{grid-template-columns:repeat(3,1fr);}
+  .scard.full{grid-column:auto;}
+  .mgrid{grid-template-columns:repeat(6,1fr);}
+  .srvgrid{grid-template-columns:repeat(4,1fr);}
+}
+@media(min-width:900px){
+  #scroll{padding-bottom:20px;}
+  #nav{display:none;}
+  #dtabs{display:flex!important;}
+}
+#dtabs{
+  display:none;background:#fff;border-bottom:1px solid var(--border);
+  padding:0 20px;gap:2px;flex-shrink:0;
+}
+.dtab{
+  padding:13px 20px;border:none;background:none;
+  font-size:13px;font-weight:800;color:var(--gray);cursor:pointer;
+  border-bottom:3px solid transparent;transition:.2s;
+  display:flex;align-items:center;gap:7px;font-family:'Cairo',sans-serif;white-space:nowrap;
+}
+.dtab.on{color:var(--blue);border-bottom-color:var(--blue);}
+/* Desktop table */
+.daptbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.daptbl th{padding:8px 10px;text-align:center;font-weight:800;font-size:9.5px;text-transform:uppercase;color:var(--gray);border-bottom:2px solid var(--border);white-space:nowrap;}
+.daptbl th:first-child{text-align:left;}
+.daptbl td{padding:7px 10px;border-bottom:1px solid #f1f5f9;text-align:center;vertical-align:middle;}
+.daptbl td:first-child{text-align:left;font-weight:800;}
+.daptbl tbody tr:hover{background:#fafbff;}
+.twrap{border:1px solid var(--border);border-radius:14px;overflow:hidden;overflow-x:auto;}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body>
 
-    <!-- ================= LOGIN SCREEN ================= -->
-    <div id="login-screen" class="flex items-center justify-center min-h-screen px-4 bg-slate-900">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-            <h1 class="text-xl font-bold text-center text-slate-900 mb-6">Syndic Application</h1>
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                <input type="text" id="username" placeholder="Identifiant" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
-                <input type="password" id="password" placeholder="Mot de passe" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
-                <div id="login-error" class="text-red-500 text-xs hidden text-center bg-red-50 p-2 rounded-lg">Identifiants incorrects.</div>
-                <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-lg">Se connecter</button>
-            </form>
+<div id="toast"></div>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen">
+  <div class="lcard">
+    <div class="llogo">
+      <svg viewBox="0 0 52 52" fill="none">
+        <rect x="6" y="22" width="40" height="26" rx="2.5" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <path d="M2 23 L26 8 L50 23" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <rect x="21" y="32" width="10" height="16" rx="2" fill="rgba(99,153,255,.75)"/>
+        <rect x="9" y="25" width="7" height="5" rx="1" fill="rgba(255,255,255,.3)"/>
+        <rect x="22" y="25" width="7" height="5" rx="1" fill="rgba(255,255,255,.3)"/>
+        <rect x="35" y="25" width="7" height="5" rx="1" fill="rgba(120,200,255,.5)"/>
+        <rect x="9" y="33" width="7" height="5" rx="1" fill="rgba(255,255,255,.2)"/>
+        <rect x="35" y="33" width="7" height="5" rx="1" fill="rgba(255,255,255,.2)"/>
+        <circle cx="43" cy="12" r="8" fill="rgba(16,185,129,.88)" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <text x="43" y="16.5" text-anchor="middle" fill="white" font-size="7.5" font-weight="bold" font-family="Arial">DH</text>
+      </svg>
+    </div>
+    <div class="ltitle">Syndic · Andalous Al Rahma 4</div>
+    <div class="lsub">Groupe 4 · Immeuble 4 · 25 Appartements</div>
+    <div class="lerr" id="lerr"><i class="fa fa-triangle-exclamation"></i> Identifiant ou mot de passe incorrect</div>
+    <input id="un" class="linput" type="text" placeholder="Identifiant" autocomplete="username" autocorrect="off" autocapitalize="off">
+    <div class="linput-wrap">
+      <input id="pw" class="linput" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="eyebtn" onclick="togglePw()" id="pweye" type="button"><i class="fa fa-eye"></i></button>
+    </div>
+    <button class="lbtn" onclick="doLogin()"><i class="fa fa-arrow-right-to-bracket"></i> Se connecter</button>
+    <div class="lfooter">© 2026 · Copropriété Andalous Al Rahma 4</div>
+  </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app">
+
+  <header id="hdr">
+    <div class="hlogo">
+      <div class="hicon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="10" width="20" height="13" rx="1.5" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+          <path d="M0 11 L12 3 L24 11" stroke="rgba(255,255,255,.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <rect x="9" y="15" width="6" height="8" rx="1" fill="rgba(99,153,255,.85)"/>
+          <rect x="3" y="12" width="4" height="3" rx=".5" fill="rgba(255,255,255,.35)"/>
+          <rect x="17" y="12" width="4" height="3" rx=".5" fill="rgba(255,255,255,.35)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="htitle">Andalous Al Rahma 4</div>
+        <div class="hsub">Gr.4 · Imb.4 · 25 Appartements</div>
+      </div>
+    </div>
+    <div class="hright">
+      <div class="huser"><i class="fa fa-user"></i><span>asaber</span></div>
+      <button class="hlogout" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i></button>
+    </div>
+  </header>
+
+  <!-- Desktop tabs -->
+  <div id="dtabs">
+    <button class="dtab on" onclick="go('dash')" id="dt-dash"><i class="fa fa-chart-pie"></i> Tableau de bord</button>
+    <button class="dtab" onclick="go('cot')" id="dt-cot"><i class="fa fa-hand-holding-dollar"></i> Cotisations</button>
+    <button class="dtab" onclick="go('dep')" id="dt-dep"><i class="fa fa-receipt"></i> Dépenses</button>
+    <button class="dtab" onclick="go('exp')" id="dt-exp"><i class="fa fa-file-export"></i> Exporter</button>
+  </div>
+
+  <div id="scroll">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="panel on" id="p-dash">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:16px;font-weight:900;display:flex;align-items:center;gap:7px;"><i class="fa fa-chart-pie" style="color:var(--blue)"></i> Vue d'ensemble</span>
+        <div class="ypill"><i class="fa fa-calendar-alt"></i>
+          <select id="dy" onchange="syncY();updDash()">
+            <option value="2024">2024</option><option value="2025">2025</option>
+            <option value="2026" selected>2026</option><option value="2027">2027</option>
+          </select>
         </div>
+      </div>
+
+      <div class="sgrid">
+        <div class="scard">
+          <div class="sicon" style="background:var(--green-l);color:var(--green)"><i class="fa fa-wallet"></i></div>
+          <div><div class="slbl">Cotisations</div><div class="sval" id="si" style="color:var(--green)">0.00 DH</div></div>
+        </div>
+        <div class="scard">
+          <div class="sicon" style="background:var(--red-l);color:var(--red)"><i class="fa fa-receipt"></i></div>
+          <div><div class="slbl">Dépenses</div><div class="sval" id="se" style="color:var(--red)">0.00 DH</div></div>
+        </div>
+        <div class="scard full">
+          <div class="sicon" style="background:var(--blue-l);color:var(--blue)"><i class="fa fa-scale-balanced"></i></div>
+          <div style="flex:1"><div class="slbl">Solde de caisse</div><div class="sval" id="sb" style="color:var(--blue)">0.00 DH</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fa fa-building" style="color:var(--blue)"></i> Taux de paiement</div>
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px">
+            <span style="color:#475569">Appartements ayant payé</span><span id="pc" style="color:var(--green)">0 / 25</span>
+          </div>
+          <div class="pbar"><div class="pbar-f" id="pp" style="width:0%;background:linear-gradient(90deg,var(--green),#10b981)"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px">
+            <span style="color:#475569">Mois de charges saisis</span><span id="ec" style="color:var(--blue)">0 / 12</span>
+          </div>
+          <div class="pbar"><div class="pbar-f" id="ep" style="width:0%;background:linear-gradient(90deg,var(--blue),#3b82f6)"></div></div>
+        </div>
+      </div>
+
+      <div class="card" id="qs"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="fa fa-calendar-days" style="color:var(--blue)"></i> Récapitulatif mensuel</div>
+        <div class="twrap">
+          <table class="mtbl">
+            <thead><tr>
+              <th>Mois</th>
+              <th style="text-align:right">Cotisations</th>
+              <th style="text-align:right">Dépenses</th>
+              <th style="text-align:right">Solde</th>
+              <th>Statut</th>
+            </tr></thead>
+            <tbody id="mtb"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= MAIN APP SCREEN ================= -->
-    <div id="app-screen" class="hidden min-h-screen flex flex-col">
-        <header class="bg-white border-b border-slate-200 h-14 flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
-            <div class="flex items-center space-x-2">
-                <span class="bg-blue-600 text-white px-2 py-1 rounded-lg text-sm font-bold">AR4</span>
-                <span class="text-sm font-bold text-slate-800">Andalous Al Rahma 4 - Grp 4 - Imb 4</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-xs font-semibold bg-slate-100 px-2.5 py-1 rounded-md"><i class="fa-solid fa-user mr-1 text-blue-600"></i>asaber</span>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
-        </header>
+    <!-- ===== COTISATIONS ===== -->
+    <div class="panel" id="p-cot">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:16px;font-weight:900;display:flex;align-items:center;gap:7px;"><i class="fa fa-hand-holding-dollar" style="color:var(--green)"></i> Cotisations</span>
+        <div class="ypill"><i class="fa fa-calendar-alt" style="color:var(--green)"></i>
+          <select id="iy" onchange="syncY();renApts()">
+            <option value="2024">2024</option><option value="2025">2025</option>
+            <option value="2026" selected>2026</option><option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
 
-        <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
-            
-            <!-- ================= TABLEAU DE BORD ================= -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Cotisations (المداخيل)</p>
-                        <h3 id="dash-total-incomes" class="text-xl font-bold text-emerald-600 mt-1">0.00 DH</h3>
-                    </div>
-                    <div class="bg-emerald-50 p-3 rounded-lg text-emerald-600"><i class="fa-solid fa-wallet text-xl"></i></div>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Dépenses (المصاريف)</p>
-                        <h3 id="dash-total-expenses" class="text-xl font-bold text-rose-600 mt-1">0.00 DH</h3>
-                    </div>
-                    <div class="bg-rose-50 p-3 rounded-lg text-rose-600"><i class="fa-solid fa-receipt text-xl"></i></div>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Solde de la Caisse (الرصيد الصافي)</p>
-                        <h3 id="dash-balance" class="text-xl font-bold text-blue-600 mt-1">0.00 DH</h3>
-                    </div>
-                    <div class="bg-blue-50 p-3 rounded-lg text-blue-600"><i class="fa-solid fa-scale-balanced text-xl"></i></div>
-                </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title"><i class="fa fa-plus-circle" style="color:var(--green)"></i> Enregistrer un paiement</div>
+        <div class="fg">
+          <label class="flbl">Appartement</label>
+          <select id="iapt" class="finput"></select>
+        </div>
+        <div class="fg">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <label class="flbl" style="margin:0">Mois payés</label>
+            <div style="display:flex;gap:7px">
+              <button class="btn btn-ghost btn-sm" onclick="selAll()"><i class="fa fa-check-double"></i> Tout</button>
+              <button class="btn btn-ghost btn-sm" onclick="clrAll()"><i class="fa fa-xmark"></i> Vider</button>
             </div>
+          </div>
+          <div class="mgrid" id="mgrid"></div>
+        </div>
+        <button class="btn btn-green btn-full" onclick="saveInc()" id="bsi"><i class="fa fa-check"></i> Enregistrer</button>
+      </div>
 
-            <!-- Action Toolbar -->
-            <div class="flex flex-wrap gap-2 justify-end bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-                <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center shadow-sm">
-                    <i class="fa-solid fa-file-excel mr-1.5"></i> Charger EXCEL
-                    <input type="file" id="import-excel" class="hidden" accept=".xlsx" onchange="importFromExcel(event)">
-                </label>
-                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm"><i class="fa-solid fa-download mr-1.5"></i>Télécharger EXCEL</button>
-                <button onclick="generatePDFReport()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm"><i class="fa-solid fa-file-pdf mr-1.5"></i>Générer PDF Pro</button>
-            </div>
-
-            <!-- ================= PAGE 1 : COTISATIONS ================= -->
-            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden accordion-item" id="sec-cotisations">
-                <button onclick="toggleAccordion('sec-cotisations')" class="w-full flex items-center justify-between p-4 font-bold text-left bg-slate-50 hover:bg-slate-100/50 transition-colors text-slate-800 border-b border-slate-200">
-                    <span class="flex items-center text-sm"><i class="fa-solid fa-hand-holding-dollar text-emerald-600 mr-2"></i>PAGE I : Suivi des Cotisations</span>
-                    <div class="flex items-center space-x-4" onclick="event.stopPropagation()">
-                        <select id="matrix-year" class="text-xs bg-white border border-slate-300 rounded p-1 font-normal" onchange="renderIncomesTable(); updateStatsAndTables();">
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                            <option value="2026" selected>2026</option>
-                            <option value="2027">2027</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down text-slate-400 btn-arrow"></i>
-                    </div>
-                </button>
-                <div class="accordion-content bg-white p-4 space-y-4">
-                    <form id="income-form" onsubmit="saveIncome(event)" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="w-48">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner l'Appartement</label>
-                                <select id="inc-appt" required class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none"></select>
-                            </div>
-                            <div class="flex-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner les mois payés</label>
-                                <div class="flex flex-wrap gap-2 mt-1" id="dots-months-container"></div>
-                            </div>
-                            <div class="w-32 pt-5">
-                                <button type="submit" id="btn-sub-inc" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"><i class="fa-solid fa-check mr-1"></i>Enregistrer</button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
-                        <table class="w-full text-left border-collapse" id="table-incomes">
-                            <thead class="bg-slate-100 font-bold border-b border-slate-200 text-slate-700 uppercase">
-                                <tr id="table-inc-head"></tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-600"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= PAGE 2 : DEPENSES ================= -->
-            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden accordion-item" id="sec-depenses">
-                <button onclick="toggleAccordion('sec-depenses')" class="w-full flex items-center justify-between p-4 font-bold text-left bg-slate-50 hover:bg-slate-100/50 transition-colors text-slate-800 border-b border-slate-200">
-                    <span class="flex items-center text-sm"><i class="fa-solid fa-receipt text-rose-600 mr-2"></i>PAGE II : Registre des Dépenses (المصاريف)</span>
-                    <i class="fa-solid fa-chevron-down text-slate-400 btn-arrow"></i>
-                </button>
-                <div class="accordion-content bg-white p-4 space-y-4">
-                    <form id="expense-form" onsubmit="saveExpense(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <input type="hidden" id="expense-edit-index" value="-1">
-                        <div class="space-y-2 col-span-1 md:col-span-3 grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Mois</label>
-                                <select id="exp-month" required class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none"></select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Année</label>
-                                <select id="exp-year" required class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none"></select>
-                            </div>
-                        </div>
-                        <div class="space-y-2 col-span-1 md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" id="services-container"></div>
-                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <label class="block text-[10px] font-bold text-amber-800 uppercase sm:col-span-3">Charges Exceptionnelles</label>
-                            <input type="text" id="exp-spec-type" placeholder="Nature" class="sm:col-span-2 bg-white border border-slate-200 rounded-lg p-2 text-xs">
-                            <input type="number" id="exp-spec-amt" placeholder="Montant DH" class="bg-white border border-slate-200 rounded-lg p-2 text-xs text-right">
-                        </div>
-                        <div class="flex items-end col-span-1">
-                            <button type="submit" id="btn-sub-exp" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"><i class="fa-solid fa-check mr-1"></i>Enregistrer</button>
-                        </div>
-                    </form>
-
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
-                        <table class="w-full text-left border-collapse" id="table-expenses">
-                            <thead class="bg-slate-100 font-bold text-slate-700 uppercase">
-                                <tr>
-                                    <th class="p-2.5">Période</th>
-                                    <th class="p-2.5">Détails Services Fixes</th>
-                                    <th class="p-2.5">Exceptionnels</th>
-                                    <th class="p-2.5 text-right">Total Mensuel</th>
-                                    <th class="p-2.5 text-center w-28">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <div id="apt-list"></div>
     </div>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
-    <script>
-        const MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-        const SERVICES_KEYS = [
-            { id: "elec", label: "Électricité" },
-            { id: "clean", label: "Nettoyage" },
-            { id: "prod", label: "Produits" },
-            { id: "ext", label: "Balayage" }
-        ];
-        
-        let db = { incomes: {}, expenses: [] };
+    <!-- ===== DEPENSES ===== -->
+    <div class="panel" id="p-dep">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span style="font-size:16px;font-weight:900;display:flex;align-items:center;gap:7px;"><i class="fa fa-receipt" style="color:var(--red)"></i> Dépenses</span>
+      </div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initAppUI();
-            checkAndBuildYearDatabase();
-            renderIncomesTable();
-            updateStatsAndTables();
-        });
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title"><i class="fa fa-plus-circle" style="color:var(--red)"></i> Ajouter une dépense</div>
+        <input type="hidden" id="eidx" value="-1">
+        <div class="frow" style="margin-bottom:14px">
+          <div class="fg" style="margin:0"><label class="flbl">Mois</label><select id="em" class="finput"></select></div>
+          <div class="fg" style="margin:0"><label class="flbl">Année</label>
+            <select id="ey" class="finput">
+              <option value="2024">2024</option><option value="2025">2025</option>
+              <option value="2026" selected>2026</option><option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-title" style="margin-bottom:10px"><i class="fa fa-wrench" style="color:var(--gray)"></i> Services récurrents</div>
+        <div class="srvgrid" id="srvgrid"></div>
+        <div style="background:var(--amber-l);border:1px solid #fde68a;border-radius:14px;padding:14px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:900;color:#92400e;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="fa fa-star"></i> Charge exceptionnelle</div>
+          <div class="frow">
+            <div><label class="flbl">Nature</label><input id="est" class="finput" type="text" placeholder="Ex: Réparation"></div>
+            <div><label class="flbl">Montant (DH)</label><input id="esa" class="finput" type="number" inputmode="decimal" placeholder="0.00" style="text-align:right"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" style="flex:1" onclick="resetExp()"><i class="fa fa-xmark"></i> Annuler</button>
+          <button class="btn btn-red" style="flex:2" onclick="saveExp()" id="bse"><i class="fa fa-check"></i> Enregistrer</button>
+        </div>
+      </div>
+      <div id="exp-list"></div>
+    </div>
 
-        function initAppUI() {
-            const incAppt = document.getElementById("inc-appt");
-            for(let i=1; i<=25; i++) incAppt.innerHTML += `<option value="${i}">Appartement ${i}</option>`;
-            
-            const expM = document.getElementById("exp-month");
-            MONTHS.forEach(m => expM.innerHTML += `<option value="${m}">${m}</option>`);
+    <!-- ===== EXPORT ===== -->
+    <div class="panel" id="p-exp">
+      <div style="font-size:16px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:7px">
+        <i class="fa fa-file-export" style="color:var(--violet)"></i> Exporter / Importer
+      </div>
 
-            const expY = document.getElementById("exp-year");
-            [2024, 2025, 2026, 2027].forEach(y => {
-                const selectedAttr = (y === 2026) ? "selected" : "";
-                expY.innerHTML += `<option value="${y}" ${selectedAttr}>${y}</option>`;
-            });
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title"><i class="fa fa-calendar" style="color:var(--blue)"></i> Année</div>
+        <div class="ypill" style="display:inline-flex"><i class="fa fa-calendar-alt"></i>
+          <select id="exy" onchange="syncY()">
+            <option value="2024">2024</option><option value="2025">2025</option>
+            <option value="2026" selected>2026</option><option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
 
-            const dotsContainer = document.getElementById("dots-months-container");
-            MONTHS.forEach((m, idx) => {
-                dotsContainer.innerHTML += `
-                    <label class="inline-flex items-center bg-white border border-slate-200 px-2 py-1 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors select-none">
-                        <input type="checkbox" value="${idx}" class="form-dot-chk rounded text-blue-600 mr-1 h-3.5 w-3.5">
-                        <span class="text-xs font-medium">${m.substring(0,3)}.</span>
-                    </label>
-                `;
-            });
+      <div class="excard">
+        <div class="excard-hd">
+          <div class="excard-ico" style="background:var(--amber-l);color:var(--amber)"><i class="fa fa-file-excel"></i></div>
+          <div><div class="excard-t">Charger Excel</div><div class="excard-s">Importer depuis un fichier .xlsx</div></div>
+        </div>
+        <label class="upzone">
+          <i class="fa fa-upload"></i>
+          <span>Appuyer pour sélectionner</span>
+          <span style="font-size:12px;color:#92400e;font-weight:600">Format .xlsx uniquement</span>
+          <input type="file" id="impf" style="display:none" accept=".xlsx" onchange="doImport(event)">
+        </label>
+      </div>
 
-            const hRow = document.getElementById("table-inc-head");
-            hRow.innerHTML = '<th class="p-2.5">Désignation</th>';
-            MONTHS.forEach(m => hRow.innerHTML += `<th class="p-2.5 text-center">${m.substring(0,4)}.</th>`);
-            hRow.innerHTML += '<th class="p-2.5 text-right">Total Payé</th><th class="p-2.5 text-center">Actions</th>';
+      <div class="excard">
+        <div class="excard-hd">
+          <div class="excard-ico" style="background:var(--green-l);color:var(--green)"><i class="fa fa-download"></i></div>
+          <div><div class="excard-t">Télécharger Excel</div><div class="excard-s">Exporter toutes les données</div></div>
+        </div>
+        <button class="btn btn-green btn-full" onclick="doExcel()"><i class="fa fa-file-excel"></i> Exporter en Excel</button>
+      </div>
 
-            const srvContainer = document.getElementById("services-container");
-            SERVICES_KEYS.forEach(s => {
-                srvContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-                        <label class="inline-flex items-center text-[11px] font-medium text-slate-700 cursor-pointer">
-                            <input type="checkbox" id="chk-${s.id}" class="rounded border-slate-300 text-blue-600 mr-1.5 h-3.5 w-3.5" onchange="document.getElementById('amt-${s.id}').disabled = !this.checked"> ${s.label}
-                        </label>
-                        <input type="number" id="amt-${s.id}" disabled placeholder="DH" class="w-16 bg-slate-50 border border-slate-200 rounded p-1 text-right text-xs">
-                    </div>
-                `;
-            });
-        }
+      <div class="excard">
+        <div class="excard-hd">
+          <div class="excard-ico" style="background:var(--red-l);color:var(--red)"><i class="fa fa-file-pdf"></i></div>
+          <div><div class="excard-t">Rapport PDF</div><div class="excard-s">Générer le rapport professionnel</div></div>
+        </div>
+        <button class="btn btn-red btn-full" onclick="doPDF()"><i class="fa fa-file-pdf"></i> Générer PDF Pro</button>
+      </div>
+    </div>
 
-        function checkAndBuildYearDatabase() {
-            const yr = document.getElementById("matrix-year").value;
-            if(!db.incomes[yr]) {
-                db.incomes[yr] = {};
-                for(let i=1; i<=25; i++) {
-                    db.incomes[yr][i] = Array(12).fill(null);
-                }
-            }
-        }
+  </div><!-- /scroll -->
 
-        function getMonthStatus(apptValue, monthIdx, selectedYear) {
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonthIdx = now.getMonth();
+  <!-- Bottom Nav -->
+  <nav id="nav">
+    <button class="nb on" onclick="go('dash')" id="nb-dash"><i class="fa fa-chart-pie"></i><span>Bord</span></button>
+    <button class="nb" onclick="go('cot')" id="nb-cot"><i class="fa fa-hand-holding-dollar"></i><span>Cotisations</span></button>
+    <button class="nb" onclick="go('dep')" id="nb-dep"><i class="fa fa-receipt"></i><span>Dépenses</span></button>
+    <button class="nb" onclick="go('exp')" id="nb-exp"><i class="fa fa-file-export"></i><span>Exporter</span></button>
+  </nav>
+</div>
 
-            if (apptValue === 50) return { label: "50.00 DH", color: "text-emerald-600 font-bold" };
-            if (selectedYear > currentYear || (selectedYear === currentYear && monthIdx > currentMonthIdx)) {
-                return { label: "-", color: "text-slate-300 text-center" };
-            }
-            return { label: "0.00 DH", color: "text-amber-600 font-medium" };
-        }
+<script>
+const MO=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const SRVS=[
+  {id:"elec", label:"Électricité", icon:"fa-bolt",     color:"#d97706",bg:"#fffbeb"},
+  {id:"clean",label:"Nettoyage",   icon:"fa-broom",    color:"#7c3aed",bg:"#f5f3ff"},
+  {id:"prod", label:"Produits",    icon:"fa-box-open", color:"#0891b2",bg:"#ecfeff"},
+  {id:"ext",  label:"Balayage",    icon:"fa-leaf",     color:"#059669",bg:"#ecfdf5"}
+];
+const NAV_CLASSES={dash:"on",cot:"on-g",dep:"on-r",exp:"on-v"};
+let db={incomes:{},expenses:[]};
 
-        // --- PAGE I : COTISATIONS (WITH NEXT APARTMENT JUMP) ---
-        function saveIncome(e) {
-            e.preventDefault();
-            checkAndBuildYearDatabase();
-            const yr = document.getElementById("matrix-year").value;
-            const apptSelect = document.getElementById("inc-appt");
-            const currentAppt = parseInt(apptSelect.value);
-            
-            let selectedMonths = [];
-            document.querySelectorAll(".form-dot-chk:checked").forEach(chk => {
-                selectedMonths.push(parseInt(chk.value));
-            });
+// ---- INIT ----
+function init(){
+  const ia=document.getElementById("iapt");
+  for(let i=1;i<=25;i++) ia.innerHTML+=`<option value="${i}">Appartement ${String(i).padStart(2,'0')}</option>`;
 
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonthIdx = now.getMonth();
+  const mg=document.getElementById("mgrid");
+  MO.forEach((m,i)=>{
+    const l=document.createElement("label");
+    l.className="mdot";l.dataset.m=i;
+    l.innerHTML=`<input type="checkbox" class="mchk" value="${i}"><i class="fa fa-check"></i>${m.substring(0,3)}`;
+    l.addEventListener("click",()=>setTimeout(()=>l.classList.toggle("on",l.querySelector("input").checked),0));
+    mg.appendChild(l);
+  });
 
-            for(let mIdx=0; mIdx<12; mIdx++) {
-                if(selectedMonths.includes(mIdx)) {
-                    db.incomes[yr][currentAppt][mIdx] = 50;
-                } else {
-                    if(parseInt(yr) < currentYear || (parseInt(yr) === currentYear && mIdx <= currentMonthIdx)) {
-                        db.incomes[yr][currentAppt][mIdx] = 0;
-                    } else {
-                        db.incomes[yr][currentAppt][mIdx] = null;
-                    }
-                }
-            }
+  const em=document.getElementById("em");
+  MO.forEach(m=>em.innerHTML+=`<option value="${m}">${m}</option>`);
+  em.value=MO[new Date().getMonth()];
 
-            updateStatsAndTables();
-            renderIncomesTable();
-            
-            // Clear current month checks
-            document.querySelectorAll(".form-dot-chk").forEach(chk => chk.checked = false);
-            document.getElementById("btn-sub-inc").innerHTML = '<i class="fa-solid fa-check mr-1"></i>Enregistrer';
+  const sg=document.getElementById("srvgrid");
+  SRVS.forEach(s=>{
+    sg.innerHTML+=`
+    <div class="srv" id="sc-${s.id}" onclick="togSrv('${s.id}')">
+      <div class="srv-top">
+        <div class="srv-ico" style="background:${s.bg};color:${s.color}"><i class="fa ${s.icon}"></i></div>
+        <span class="srv-lbl">${s.label}</span>
+        <input type="checkbox" id="schk-${s.id}" class="srv-chk" onclick="event.stopPropagation();togSrv('${s.id}')">
+      </div>
+      <input type="number" id="samt-${s.id}" disabled placeholder="Montant DH" class="srv-amt" inputmode="decimal" onclick="event.stopPropagation()">
+    </div>`;
+  });
 
-            // Smart Step Auto Jump to Next Apartment (1 to 25 loop rotation)
-            let nextAppt = currentAppt + 1;
-            if (nextAppt > 25) nextAppt = 1;
-            apptSelect.value = nextAppt;
-        }
+  buildY(getY());renApts();renExpList();updDash();
+}
 
-        function editIncome(appt) {
-            checkAndBuildYearDatabase();
-            const yr = document.getElementById("matrix-year").value;
-            document.getElementById("inc-appt").value = appt;
-            
-            document.querySelectorAll(".form-dot-chk").forEach((chk, mIdx) => {
-                chk.checked = db.incomes[yr][appt][mIdx] === 50;
-            });
+function buildY(yr){
+  if(!db.incomes[yr]){
+    db.incomes[yr]={};
+    for(let i=1;i<=25;i++) db.incomes[yr][i]=Array(12).fill(null);
+  }
+}
+function getY(){return document.getElementById("dy").value;}
+function syncY(){
+  const yr=document.getElementById("dy").value||document.getElementById("iy").value||document.getElementById("exy").value;
+  ["dy","iy","exy"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
+  buildY(yr);
+}
 
-            document.getElementById("btn-sub-inc").innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Modifier';
-            toggleAccordion('sec-cotisations');
-        }
+// ---- TABS ----
+function go(name){
+  ["dash","cot","dep","exp"].forEach(t=>{
+    document.getElementById("p-"+t).classList.toggle("on",t===name);
+    const nb=document.getElementById("nb-"+t);
+    const dt=document.getElementById("dt-"+t);
+    if(nb){nb.className="nb";if(t===name)nb.classList.add(NAV_CLASSES[t]);}
+    if(dt) dt.classList.toggle("on",t===name);
+  });
+  if(name==="cot"){syncY();renApts();}
+  if(name==="dep") renExpList();
+  if(name==="dash") updDash();
+  document.getElementById("scroll").scrollTop=0;
+}
 
-        function deleteIncome(appt) {
-            if(confirm(`Réinitialiser l'appartement ${appt} ?`)) {
-                const yr = document.getElementById("matrix-year").value;
-                db.incomes[yr][appt] = Array(12).fill(null);
-                updateStatsAndTables();
-                renderIncomesTable();
-            }
-        }
+// ---- SERVICE TOGGLE ----
+function togSrv(id){
+  const chk=document.getElementById("schk-"+id);
+  const amt=document.getElementById("samt-"+id);
+  const card=document.getElementById("sc-"+id);
+  chk.checked=!chk.checked;
+  amt.disabled=!chk.checked;
+  card.classList.toggle("on",chk.checked);
+  if(chk.checked) setTimeout(()=>amt.focus(),50);
+}
 
-        function renderIncomesTable() {
-            checkAndBuildYearDatabase();
-            const yr = document.getElementById("matrix-year").value;
-            const tbody = document.querySelector("#table-incomes tbody");
-            tbody.innerHTML = "";
+// ---- MONTHS ----
+function selAll(){document.querySelectorAll(".mchk").forEach(c=>{c.checked=true;c.closest(".mdot").classList.add("on");});}
+function clrAll(){document.querySelectorAll(".mchk").forEach(c=>{c.checked=false;c.closest(".mdot").classList.remove("on");});}
 
-            for(let app=1; app<=25; app++) {
-                let rowSum = 0;
-                let rowHTML = `<tr class="hover:bg-slate-50/50">
-                    <td class="p-2.5 font-bold text-slate-900">Appartement ${app}</td>`;
+// ---- SAVE INCOME ----
+function saveInc(){
+  const yr=document.getElementById("iy").value;
+  const appt=parseInt(document.getElementById("iapt").value);
+  if(!appt){toast("Sélectionner un appartement","err");return;}
+  buildY(yr);
+  const now=new Date(),cy=now.getFullYear(),cm=now.getMonth(),sy=parseInt(yr);
+  const chk=Array.from(document.querySelectorAll(".mchk:checked")).map(c=>parseInt(c.value));
+  for(let m=0;m<12;m++){
+    if(chk.includes(m)) db.incomes[yr][appt][m]=50;
+    else if(sy<cy||(sy===cy&&m<=cm)) db.incomes[yr][appt][m]=0;
+    else db.incomes[yr][appt][m]=null;
+  }
+  renApts();updDash();clrAll();
+  document.getElementById("bsi").innerHTML='<i class="fa fa-check"></i> Enregistrer';
+  let nx=appt+1;if(nx>25)nx=1;
+  document.getElementById("iapt").value=nx;
+  toast(`Appartement ${appt} enregistré ✓`,"ok");
+}
 
-                for(let mIdx=0; mIdx<12; mIdx++) {
-                    let val = db.incomes[yr][app][mIdx];
-                    if(val === 50) rowSum += 50;
-                    let status = getMonthStatus(val, mIdx, parseInt(yr));
-                    rowHTML += `<td class="p-2.5 text-center ${status.color}">${status.label}</td>`;
-                }
+function editApt(a){
+  go("cot");
+  const yr=document.getElementById("iy").value;buildY(yr);
+  document.getElementById("iapt").value=a;
+  document.querySelectorAll(".mchk").forEach((c,i)=>{
+    const p=db.incomes[yr][a][i]===50;c.checked=p;c.closest(".mdot").classList.toggle("on",p);
+  });
+  document.getElementById("bsi").innerHTML='<i class="fa fa-arrows-rotate"></i> Modifier';
+  document.getElementById("scroll").scrollTop=0;
+}
 
-                rowHTML += `
-                    <td class="p-2.5 text-right font-bold text-blue-600">${rowSum.toFixed(2)} DH</td>
-                    <td class="p-2.5 text-center space-x-2">
-                        <button onclick="editIncome(${app})" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteIncome(${app})" class="text-red-400 hover:text-red-600 text-xs"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                </tr>`;
-                tbody.innerHTML += rowHTML;
-            }
-        }
+function delApt(a){
+  if(!confirm(`Réinitialiser appartement ${a} ?`)) return;
+  const yr=document.getElementById("iy").value;
+  db.incomes[yr][a]=Array(12).fill(null);
+  renApts();updDash();toast("Réinitialisé","ok");
+}
 
-        // --- PAGE II : EXPENSES (WITH NEXT MONTH JUMP) ---
-        function saveExpense(e) {
-            e.preventDefault();
-            const monthSelect = document.getElementById("exp-month");
-            const currentMonth = monthSelect.value;
-            const year = parseInt(document.getElementById("exp-year").value);
-            const editIdx = parseInt(document.getElementById("expense-edit-index").value);
+// ---- RENDER APTS ----
+function renApts(){
+  const yr=document.getElementById("iy").value;buildY(yr);
+  const now=new Date(),cont=document.getElementById("apt-list");
+  cont.innerHTML="";
+  const isMob=window.innerWidth<900;
 
-            let services = {};
-            SERVICES_KEYS.forEach(s => {
-                services[s.id] = document.getElementById(`chk-${s.id}`).checked ? (parseFloat(document.getElementById(`amt-${s.id}`).value) || 0) : 0;
-            });
+  if(isMob){
+    for(let a=1;a<=25;a++){
+      let sum=0,chips="";
+      for(let m=0;m<12;m++){
+        const v=db.incomes[yr][a][m];
+        const fut=parseInt(yr)>now.getFullYear()||(parseInt(yr)===now.getFullYear()&&m>now.getMonth());
+        if(v===50){sum+=50;chips+=`<span class="mchip" style="background:#dcfce7;color:#15803d">${MO[m].substring(0,3)}</span>`;}
+        else if(v===0){chips+=`<span class="mchip" style="background:#fef3c7;color:#92400e">${MO[m].substring(0,3)}</span>`;}
+        else if(!fut){chips+=`<span class="mchip" style="background:#fee2e2;color:#991b1b">${MO[m].substring(0,3)}</span>`;}
+      }
+      cont.innerHTML+=`
+      <div class="apt-card">
+        <div class="apt-head">
+          <div class="apt-name">
+            <span class="apt-num">${String(a).padStart(2,'0')}</span>
+            Appartement ${String(a).padStart(2,'0')}
+          </div>
+          <span class="apt-sum">${sum.toFixed(2)} DH</span>
+        </div>
+        <div class="apt-chips">${chips||'<span style="color:#94a3b8;font-size:13px;font-weight:600">Aucun paiement enregistré</span>'}</div>
+        <div class="apt-acts">
+          <button onclick="editApt(${a})" class="btn btn-ghost btn-sm" style="flex:1"><i class="fa fa-pen-to-square"></i> Modifier</button>
+          <button onclick="delApt(${a})" class="btn btn-del btn-sm" style="flex:1"><i class="fa fa-trash-can"></i> Réinit.</button>
+        </div>
+      </div>`;
+    }
+  } else {
+    let h=`<div class="twrap"><table class="daptbl"><thead><tr><th>Appartement</th>`;
+    MO.forEach(m=>h+=`<th>${m.substring(0,4)}.</th>`);
+    h+=`<th style="text-align:right">Total</th><th style="text-align:center">Actions</th></tr></thead><tbody>`;
+    for(let a=1;a<=25;a++){
+      let sum=0;h+=`<tr><td>Apt ${String(a).padStart(2,'0')}</td>`;
+      for(let m=0;m<12;m++){
+        const v=db.incomes[yr][a][m];
+        const fut=parseInt(yr)>now.getFullYear()||(parseInt(yr)===now.getFullYear()&&m>now.getMonth());
+        if(v===50){sum+=50;h+=`<td><span class="badge bg">50</span></td>`;}
+        else if(v===0){h+=`<td><span class="badge ba">0</span></td>`;}
+        else if(fut){h+=`<td style="color:#cbd5e1">—</td>`;}
+        else{h+=`<td><span class="badge br">!</span></td>`;}
+      }
+      h+=`<td style="text-align:right;font-weight:900;color:var(--blue)">${sum.toFixed(2)} DH</td>
+        <td style="text-align:center;white-space:nowrap">
+          <button onclick="editApt(${a})" style="background:none;border:none;color:#3b82f6;cursor:pointer;font-size:14px;padding:4px 6px"><i class="fa fa-pen-to-square"></i></button>
+          <button onclick="delApt(${a})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:4px 6px"><i class="fa fa-trash-can"></i></button>
+        </td></tr>`;
+    }
+    h+=`</tbody></table></div>`;
+    cont.innerHTML=h;
+  }
+}
 
-            let special = {
-                type: document.getElementById("exp-spec-type").value || "Aucun",
-                amt: parseFloat(document.getElementById("exp-spec-amt").value) || 0
-            };
+// ---- SAVE EXPENSE ----
+function saveExp(){
+  const mo=document.getElementById("em").value;
+  const yr=parseInt(document.getElementById("ey").value);
+  const idx=parseInt(document.getElementById("eidx").value);
+  let svcs={},total=0;
+  SRVS.forEach(s=>{
+    const v=document.getElementById("schk-"+s.id).checked?(parseFloat(document.getElementById("samt-"+s.id).value)||0):0;
+    svcs[s.id]=v;total+=v;
+  });
+  const sa=parseFloat(document.getElementById("esa").value)||0;
+  const st=document.getElementById("est").value||"—";
+  total+=sa;
+  const rec={month:mo,year:yr,services:svcs,special:{amt:sa,type:st},total};
+  if(idx===-1) db.expenses.push(rec);
+  else{db.expenses[idx]=rec;document.getElementById("eidx").value="-1";}
+  renExpList();updDash();resetExp();
+  const ci=MO.indexOf(mo);
+  document.getElementById("em").value=MO[(ci+1)%12];
+  toast(`Dépense ${mo} ${yr} enregistrée ✓`,"ok");
+}
 
-            let total = Object.values(services).reduce((a,b)=>a+b,0) + special.amt;
-            let record = { month: currentMonth, year, services, special, total };
+function resetExp(){
+  document.getElementById("eidx").value="-1";
+  document.getElementById("est").value="";
+  document.getElementById("esa").value="";
+  document.getElementById("bse").innerHTML='<i class="fa fa-check"></i> Enregistrer';
+  SRVS.forEach(s=>{
+    document.getElementById("schk-"+s.id).checked=false;
+    document.getElementById("samt-"+s.id).disabled=true;
+    document.getElementById("samt-"+s.id).value="";
+    document.getElementById("sc-"+s.id).classList.remove("on");
+  });
+}
 
-            if(editIdx === -1) db.expenses.push(record);
-            else { db.expenses[editIdx] = record; document.getElementById("expense-edit-index").value = "-1"; }
-            
-            updateStatsAndTables();
-            document.getElementById("expense-form").reset();
-            document.getElementById("exp-year").value = year; // Retain current operational year
-            SERVICES_KEYS.forEach(s => document.getElementById(`amt-${s.id}`).disabled = true);
+function editExp(idx){
+  go("dep");
+  const ex=db.expenses[idx];
+  document.getElementById("em").value=ex.month;
+  document.getElementById("ey").value=ex.year;
+  SRVS.forEach(s=>{
+    const v=ex.services[s.id]||0;
+    document.getElementById("schk-"+s.id).checked=v>0;
+    document.getElementById("samt-"+s.id).disabled=v===0;
+    document.getElementById("samt-"+s.id).value=v>0?v:"";
+    document.getElementById("sc-"+s.id).classList.toggle("on",v>0);
+  });
+  document.getElementById("est").value=ex.special.type!=="—"?ex.special.type:"";
+  document.getElementById("esa").value=ex.special.amt>0?ex.special.amt:"";
+  document.getElementById("eidx").value=idx;
+  document.getElementById("bse").innerHTML='<i class="fa fa-arrows-rotate"></i> Modifier';
+  document.getElementById("scroll").scrollTop=0;
+}
 
-            // Smart Auto Jump to Next Month sequentially 
-            let curIdx = MONTHS.indexOf(currentMonth);
-            let nextIdx = curIdx + 1;
-            if (nextIdx >= 12) nextIdx = 0;
-            monthSelect.value = MONTHS[nextIdx];
-        }
+function delExp(idx){
+  if(!confirm("Supprimer cette dépense ?")) return;
+  db.expenses.splice(idx,1);renExpList();updDash();toast("Supprimée","ok");
+}
 
-        function editExpense(idx) {
-            let ex = db.expenses[idx];
-            document.getElementById("exp-month").value = ex.month;
-            document.getElementById("exp-year").value = ex.year;
-            SERVICES_KEYS.forEach(s => {
-                let val = ex.services[s.id] || 0;
-                document.getElementById(`chk-${s.id}`).checked = val > 0;
-                document.getElementById(`amt-${s.id}`).disabled = val === 0;
-                document.getElementById(`amt-${s.id}`).value = val > 0 ? val : '';
-            });
-            document.getElementById("exp-spec-type").value = ex.special.type;
-            document.getElementById("exp-spec-amt").value = ex.special.amt > 0 ? ex.special.amt : '';
-            document.getElementById("expense-edit-index").value = idx;
-            toggleAccordion('sec-depenses');
-        }
+// ---- RENDER EXPENSES ----
+function renExpList(){
+  const yr=document.getElementById("ey").value||getY();
+  const cont=document.getElementById("exp-list");
+  cont.innerHTML="";
+  const fil=db.expenses.filter(e=>e.year==yr);
+  if(!fil.length){
+    cont.innerHTML=`<div class="empty"><i class="fa fa-inbox"></i><p>Aucune dépense pour ${yr}</p></div>`;
+    return;
+  }
+  const isMob=window.innerWidth<900;
+  if(isMob){
+    fil.forEach(e=>{
+      const gi=db.expenses.indexOf(e);
+      let chips="";
+      SRVS.forEach(s=>{
+        const v=e.services[s.id]||0;
+        if(v>0) chips+=`<span class="badge" style="background:${s.bg};color:${s.color}">${s.label}: ${v.toFixed(2)} DH</span>`;
+      });
+      if(e.special.amt>0) chips+=`<span class="badge br">Excep: ${e.special.amt.toFixed(2)} DH</span>`;
+      cont.innerHTML+=`
+      <div class="exp-card">
+        <div class="exp-head">
+          <span class="exp-per">${e.month} ${e.year}</span>
+          <span class="exp-tot">${e.total.toFixed(2)} DH</span>
+        </div>
+        <div class="exp-chips">${chips||'<span style="color:#94a3b8;font-size:13px;font-weight:600">Aucun détail</span>'}</div>
+        ${e.special.amt>0?`<div style="font-size:12px;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:5px"><i class="fa fa-star" style="color:var(--amber)"></i> ${e.special.type}</div>`:''}
+        <div class="exp-acts">
+          <button onclick="editExp(${gi})" class="btn btn-ghost btn-sm" style="flex:1"><i class="fa fa-pen-to-square"></i> Modifier</button>
+          <button onclick="delExp(${gi})" class="btn btn-del btn-sm" style="flex:1"><i class="fa fa-trash-can"></i> Supprimer</button>
+        </div>
+      </div>`;
+    });
+  } else {
+    let h=`<div class="twrap"><table class="mtbl">
+      <thead><tr><th>Période</th><th>Électricité</th><th>Nettoyage</th><th>Produits</th><th>Balayage</th><th>Exceptionnel</th><th style="text-align:right">Total</th><th style="text-align:center">Actions</th></tr></thead><tbody>`;
+    fil.forEach(e=>{
+      const gi=db.expenses.indexOf(e);
+      const fb=(v,cls)=>v>0?`<span class="badge ${cls}">${v.toFixed(2)} DH</span>`:`<span style="color:#cbd5e1">—</span>`;
+      h+=`<tr>
+        <td style="font-weight:800">${e.month} ${e.year}</td>
+        <td>${fb(e.services.elec,"ba")}</td>
+        <td>${fb(e.services.clean,"bv")}</td>
+        <td>${fb(e.services.prod,"bc")}</td>
+        <td>${fb(e.services.ext,"bg")}</td>
+        <td>${e.special.amt>0?`<span class="badge br">${e.special.amt.toFixed(2)} DH</span><br><span style="font-size:9px;color:#94a3b8">${e.special.type}</span>`:'<span style="color:#cbd5e1">—</span>'}</td>
+        <td style="text-align:right;font-weight:900;color:var(--red)">${e.total.toFixed(2)} DH</td>
+        <td style="text-align:center;white-space:nowrap">
+          <button onclick="editExp(${gi})" style="background:none;border:none;color:#3b82f6;cursor:pointer;font-size:14px;padding:4px 6px"><i class="fa fa-pen-to-square"></i></button>
+          <button onclick="delExp(${gi})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:4px 6px"><i class="fa fa-trash-can"></i></button>
+        </td></tr>`;
+    });
+    h+=`</tbody></table></div>`;
+    cont.innerHTML=h;
+  }
+}
 
-        function deleteExpense(idx) { if(confirm("Supprimer ce frais ?")) { db.expenses.splice(idx, 1); updateStatsAndTables(); } }
+// ---- DASHBOARD ----
+function updDash(){
+  const yr=getY();buildY(yr);
+  const now=new Date();
+  let totalIn=0;
+  Object.values(db.incomes[yr]||{}).forEach(arr=>arr.forEach(v=>{if(v===50)totalIn+=50;}));
+  const fexp=db.expenses.filter(e=>e.year==yr);
+  let totalOut=fexp.reduce((s,e)=>s+e.total,0);
+  const bal=totalIn-totalOut;
 
-        function updateStatsAndTables() {
-            const yr = document.getElementById("matrix-year").value;
-            let totalIn = 0;
-            if(db.incomes[yr]) {
-                Object.values(db.incomes[yr]).forEach(arr => {
-                    arr.forEach(v => { if(v === 50) totalIn += 50; });
-                });
-            }
-            
-            let totalOut = db.expenses.filter(e => e.year == yr).reduce((sum, item) => sum + item.total, 0);
-            
-            document.getElementById("dash-total-incomes").innerText = `${totalIn.toFixed(2)} DH`;
-            document.getElementById("dash-total-expenses").innerText = `${totalOut.toFixed(2)} DH`;
-            document.getElementById("dash-balance").innerText = `${(totalIn - totalOut).toFixed(2)} DH`;
+  document.getElementById("si").textContent=`${totalIn.toFixed(2)} DH`;
+  document.getElementById("se").textContent=`${totalOut.toFixed(2)} DH`;
+  const sb=document.getElementById("sb");
+  sb.textContent=`${bal.toFixed(2)} DH`;
+  sb.style.color=bal>=0?"var(--blue)":"var(--red)";
 
-            const tbodyExp = document.querySelector("#table-expenses tbody");
-            tbodyExp.innerHTML = "";
-            db.expenses.filter(e => e.year == yr).forEach((e, idx) => {
-                let details = Object.entries(e.services).map(([k,v]) => `${k}:${v}DH`).join(' | ');
-                tbodyExp.innerHTML += `<tr>
-                    <td class="p-2.5 font-bold text-slate-900">${e.month} ${e.year}</td>
-                    <td class="p-2.5 text-slate-500">${details}</td>
-                    <td class="p-2.5 text-slate-400">${e.special.amt} DH (${e.special.type})</td>
-                    <td class="p-2.5 text-right font-bold text-rose-600">${e.total.toFixed(2)} DH</td>
-                    <td class="p-2.5 text-center space-x-2">
-                        <button onclick="editExpense(${idx})" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteExpense(${idx})" class="text-red-400 hover:text-red-600 text-xs"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                </tr>`;
-            });
-        }
+  let paidApts=0;
+  Object.values(db.incomes[yr]||{}).forEach(arr=>{if(arr.some(v=>v===50))paidApts++;});
+  document.getElementById("pc").textContent=`${paidApts} / 25`;
+  document.getElementById("pp").style.width=`${(paidApts/25)*100}%`;
+  const em=Math.min(fexp.length,12);
+  document.getElementById("ec").textContent=`${em} / 12`;
+  document.getElementById("ep").style.width=`${(em/12)*100}%`;
 
-        function toggleAccordion(id) {
-            const item = document.getElementById(id);
-            const isOpen = item.classList.contains("accordion-open");
-            document.querySelectorAll(".accordion-item").forEach(el => { el.classList.remove("accordion-open"); });
-            if (!isOpen) item.classList.add("accordion-open");
-        }
+  const maxIn=25*12*50;
+  const rate=maxIn>0?Math.round((totalIn/maxIn)*100):0;
+  const rc=rate>70?"var(--green)":rate>40?"var(--amber)":"var(--red)";
+  const avg=fexp.length>0?(totalOut/fexp.length).toFixed(2):"0.00";
+  document.getElementById("qs").innerHTML=`
+    <div class="card-title"><i class="fa fa-circle-info" style="color:var(--blue)"></i> Résumé rapide</div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:#f8fafc;border-radius:11px">
+        <span style="font-size:14px;font-weight:600;color:var(--gray)">Taux de recouvrement</span>
+        <span style="font-size:15px;font-weight:900;color:${rc}">${rate}%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:#f8fafc;border-radius:11px">
+        <span style="font-size:14px;font-weight:600;color:var(--gray)">Moy. dépense mensuelle</span>
+        <span style="font-size:15px;font-weight:900;color:var(--red)">${avg} DH</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:${bal>=0?"var(--green-l)":"var(--red-l)"};border-radius:11px">
+        <span style="font-size:14px;font-weight:600;color:var(--gray)">Situation financière</span>
+        <span style="font-size:15px;font-weight:900;color:${bal>=0?"var(--green)":"var(--red)"}">${bal>=0?"✓ Excédent":"⚠ Déficit"}</span>
+      </div>
+    </div>`;
 
-        function handleLogin(e) {
-            e.preventDefault();
-            if(document.getElementById("username").value === "asaber" && document.getElementById("password").value === "Al@e16Lokmn23") {
-                document.getElementById("login-screen").classList.add("hidden");
-                document.getElementById("app-screen").classList.remove("hidden");
-                toggleAccordion('sec-cotisations');
-            } else { document.getElementById("login-error").classList.remove("hidden"); }
-        }
-        function handleLogout() { document.getElementById("app-screen").classList.add("hidden"); document.getElementById("login-screen").classList.remove("hidden"); }
+  const mtb=document.getElementById("mtb");
+  mtb.innerHTML="";
+  MO.forEach((m,i)=>{
+    let mIn=0;
+    Object.values(db.incomes[yr]||{}).forEach(arr=>{if(arr[i]===50)mIn+=50;});
+    const er=fexp.find(e=>e.month===m);
+    const mOut=er?er.total:0;
+    const mb=mIn-mOut;
+    const isPast=parseInt(yr)<now.getFullYear()||(parseInt(yr)===now.getFullYear()&&i<=now.getMonth());
+    const isCur=parseInt(yr)===now.getFullYear()&&i===now.getMonth();
+    let badge='';
+    if(!isPast) badge=`<span class="badge bs">À venir</span>`;
+    else if(mb>0) badge=`<span class="badge bg">Excédent</span>`;
+    else if(mb<0) badge=`<span class="badge br">Déficit</span>`;
+    else badge=`<span class="badge ba">Équilibré</span>`;
+    mtb.innerHTML+=`<tr style="${isCur?'background:#fffbeb':''}">
+      <td style="font-weight:700;${isCur?'color:var(--amber)':''}">${m}${isCur?` <span style="font-size:9px;color:var(--amber)">← maintenant</span>`:''}</td>
+      <td style="text-align:right;color:var(--green);font-weight:700">${mIn.toFixed(2)} DH</td>
+      <td style="text-align:right;color:var(--red);font-weight:700">${mOut.toFixed(2)} DH</td>
+      <td style="text-align:right;font-weight:800;color:${mb>=0?"var(--blue)":"var(--red)"}">${mb.toFixed(2)} DH</td>
+      <td>${badge}</td>
+    </tr>`;
+  });
 
-        // ================= EXPORT SYSTEM =================
-        function exportToExcel() {
-            let wb = XLSX.utils.book_new();
-            const yr = document.getElementById("matrix-year").value;
+  renExpList();
+}
 
-            let aoaData = [
-                [`SOCIETE COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - ANNEE ${yr}`],
-                ["Appartement (A)", ...MONTHS, "Total Annuel (DH)"]
-            ];
-            let monthlySums = Array(12).fill(0);
-            for(let app=1; app<=25; app++) {
-                let row = [`Appartement ${app}`];
-                let appSum = 0;
-                for(let mIdx=0; mIdx<12; mIdx++) {
-                    let val = db.incomes[yr][app][mIdx];
-                    if(val === 50) { row.push(50.00); appSum += 50; monthlySums[mIdx] += 50; }
-                    else if(val === 0) { row.push(0.00); }
-                    else { row.push("-"); }
-                }
-                row.push(appSum);
-                aoaData.push(row);
-            }
-            aoaData.push(["Total Mensuel", ...monthlySums, monthlySums.reduce((a,b)=>a+b,0)]);
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoaData), "Cotisations");
+// ---- AUTH ----
+function doLogin(){
+  const u=document.getElementById("un").value;
+  const p=document.getElementById("pw").value;
+  if(u==="asaber"&&p==="Al@e16Lokmn23"){
+    document.getElementById("login-screen").style.display="none";
+    const app=document.getElementById("app");
+    app.style.display="flex";
+    init();
+  } else {
+    const err=document.getElementById("lerr");
+    err.style.display="block";
+    setTimeout(()=>err.style.display="none",3000);
+  }
+}
+function doLogout(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("login-screen").style.display="flex";
+  document.getElementById("un").value="";
+  document.getElementById("pw").value="";
+}
+function togglePw(){
+  const pw=document.getElementById("pw"),e=document.getElementById("pweye");
+  pw.type=pw.type==="password"?"text":"password";
+  e.innerHTML=pw.type==="password"?'<i class="fa fa-eye"></i>':'<i class="fa fa-eye-slash"></i>';
+}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("login-screen").style.display!=="none")doLogin();});
 
-            let expRows = [["Mois", "Année", "Électricité", "Nettoyage", "Produits", "Balayage", "Montant Exceptionnel", "Nature Frais", "Total Mensuel (DH)"]];
-            db.expenses.filter(e => e.year == yr).forEach(e => {
-                expRows.push([
-                    e.month, e.year, 
-                    e.services.elec || 0, e.services.clean || 0, e.services.prod || 0, e.services.ext || 0, 
-                    e.special.amt || 0, e.special.type || "-", e.total || 0
-                ]);
-            });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(expRows), "Dépenses");
+// ---- TOAST ----
+let toastT;
+function toast(msg,type="ok"){
+  const t=document.getElementById("toast");
+  t.className=`toast show ${type}`;
+  t.innerHTML=`<i class="fa ${type==="ok"?"fa-circle-check":"fa-circle-xmark"}"></i> ${msg}`;
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.className="toast",2800);
+}
 
-            XLSX.writeFile(wb, `Registre_Syndic_Andalous4_${yr}.xlsx`);
-        }
+// ---- RESIZE ----
+let resT;
+window.addEventListener("resize",()=>{clearTimeout(resT);resT=setTimeout(()=>{renApts();renExpList();},200);});
 
-        // ================= IMPORT SYSTEM =================
-        function importFromExcel(e) {
-            let file = e.target.files[0]; if (!file) return;
-            let reader = new FileReader(); reader.readAsArrayBuffer(file);
-            reader.onload = function(evt) {
-                try {
-                    let data = new Uint8Array(evt.target.result);
-                    let workbook = XLSX.read(data, { type: 'array' });
-                    
-                    const yr = document.getElementById("matrix-year").value;
-                    if(!db.incomes[yr]) db.incomes[yr] = {};
+// ---- EXCEL EXPORT ----
+function doExcel(){
+  const yr=document.getElementById("exy").value||getY();buildY(yr);
+  let wb=XLSX.utils.book_new();
+  let aoa=[[`COPROPRIETE ANDALOUS AL RAHMA GR4 IM4 - ANNEE ${yr}`],["Appartement",...MO,"Total (DH)"]];
+  let ms=Array(12).fill(0);
+  for(let a=1;a<=25;a++){
+    let row=[`Appartement ${a}`],s=0;
+    for(let m=0;m<12;m++){const v=db.incomes[yr][a][m];if(v===50){row.push(50);s+=50;ms[m]+=50;}else if(v===0)row.push(0);else row.push("-");}
+    row.push(s);aoa.push(row);
+  }
+  aoa.push(["Total Mensuel",...ms,ms.reduce((a,b)=>a+b,0)]);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),"Cotisations");
+  let er=[["Mois","Année","Élec","Nettoyage","Produits","Balayage","Exceptionnel","Nature","Total"]];
+  db.expenses.filter(e=>e.year==yr).forEach(e=>er.push([e.month,e.year,e.services.elec||0,e.services.clean||0,e.services.prod||0,e.services.ext||0,e.special.amt||0,e.special.type||"-",e.total||0]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(er),"Dépenses");
+  XLSX.writeFile(wb,`Syndic_AR4_${yr}.xlsx`);
+  toast("Excel téléchargé ✓","ok");
+}
 
-                    let sheet1 = workbook.Sheets["Cotisations"];
-                    if(sheet1) {
-                        let rows = XLSX.utils.sheet_to_json(sheet1, { header: 1 });
-                        for(let i=2; i<=26; i++) {
-                            let r = rows[i]; if(!r) continue;
-                            let appNum = parseInt(r[0].replace(/[^0-9]/g, ''));
-                            if(!appNum) continue;
+// ---- IMPORT ----
+function doImport(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const yr=document.getElementById("exy").value||getY();buildY(yr);
+      const s1=wb.Sheets["Cotisations"];
+      if(s1){const rows=XLSX.utils.sheet_to_json(s1,{header:1});for(let i=2;i<=26;i++){const r=rows[i];if(!r)continue;const an=parseInt((r[0]||"").toString().replace(/[^0-9]/g,''));if(!an)continue;db.incomes[yr][an]=Array(12).fill(null);for(let m=0;m<12;m++){const cv=r[m+1];if(cv==50||cv==="50")db.incomes[yr][an][m]=50;else if(cv==0||cv==="0"||cv==="00,00")db.incomes[yr][an][m]=0;}}}
+      const s2=wb.Sheets["Dépenses"];
+      if(s2){const rows=XLSX.utils.sheet_to_json(s2,{header:1});db.expenses=db.expenses.filter(e=>e.year!=yr);for(let i=1;i<rows.length;i++){const r=rows[i];if(!r||!r[0])continue;db.expenses.push({month:r[0],year:parseInt(r[1]),services:{elec:parseFloat(r[2])||0,clean:parseFloat(r[3])||0,prod:parseFloat(r[4])||0,ext:parseFloat(r[5])||0},special:{amt:parseFloat(r[6])||0,type:r[7]||"-"},total:parseFloat(r[8])||0});}}
+      renApts();renExpList();updDash();
+      toast("Base synchronisée ✓","ok");
+    }catch(err){toast("Format invalide","err");}
+  };
+  r.readAsArrayBuffer(f);ev.target.value="";
+}
 
-                            db.incomes[yr][appNum] = Array(12).fill(null);
-                            for(let mIdx=0; mIdx<12; mIdx++) {
-                                let cellVal = r[mIdx+1];
-                                if(cellVal === 50 || cellVal === "50") db.incomes[yr][appNum][mIdx] = 50;
-                                else if(cellVal === 0 || cellVal === "0" || cellVal === "00,00") db.incomes[yr][appNum][mIdx] = 0;
-                            }
-                        }
-                    }
-
-                    let sheet2 = workbook.Sheets["Dépenses"];
-                    if(sheet2) {
-                        let rows = XLSX.utils.sheet_to_json(sheet2, { header: 1 });
-                        db.expenses = db.expenses.filter(e => e.year != yr);
-                        for(let i=1; i<rows.length; i++) {
-                            let r = rows[i]; if(!r || !r[0]) continue;
-                            db.expenses.push({
-                                month: r[0], year: parseInt(r[1]),
-                                services: { elec: parseFloat(r[2])||0, clean: parseFloat(r[3])||0, prod: parseFloat(r[4])||0, ext: parseFloat(r[5])||0 },
-                                special: { amt: parseFloat(r[6])||0, type: r[7] || "-" }, total: parseFloat(r[8])||0
-                            });
-                        }
-                    }
-
-                    renderIncomesTable(); 
-                    updateStatsAndTables(); 
-                    alert("Base de données synchronisée !");
-                } catch(err) { alert("Format invalide."); }
-            };
-        }
-
-        // ================= PDF REPORT GENERATOR (DETAILED EXPENSES EXCLUSION) =================
-        function generatePDFReport() {
-            const { jsPDF } = window.jspdf;
-            let doc = new jsPDF('l', 'mm', 'a4'); 
-            const yr = document.getElementById("matrix-year").value;
-
-            // PAGE I: Incomes Spreadsheet Matrix
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(12); doc.setFont("Helvetica", "bold");
-            doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
-
-            doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-            doc.text("PAGE I : SUIVI DE VENTILATION DES COTISATIONS MENSUELLES DIRECTES (MADAHEL)", 12, 26);
-
-            let pdfHeaders = ["Appartement", ...MONTHS.map(m=>m.substring(0,4)+'.'), "Total (DH)"];
-            let pdfRows = [];
-            let monthlySums = Array(12).fill(0);
-
-            for(let app=1; app<=25; app++) {
-                let row = [`Appartement ${app}`];
-                let appSum = 0;
-                for(let mIdx=0; mIdx<12; mIdx++) {
-                    let val = db.incomes[yr]?.[app]?.[mIdx];
-                    if(val === 50) { row.push("50,00"); appSum += 50; monthlySums[mIdx] += 50; }
-                    else if(val === 0) { row.push("00,00"); }
-                    else { row.push("-"); }
-                }
-                row.push(`${appSum.toFixed(2)} DH`);
-                pdfRows.push(row);
-            }
-            pdfRows.push(["Total Mensuel", ...monthlySums.map(v=>`${v.toFixed(2)} DH`), `${monthlySums.reduce((a,b)=>a+b,0).toFixed(2)} DH`]);
-
-            doc.autoTable({
-                startY: 30, head: [pdfHeaders], body: pdfRows,
-                styles: { fontSize: 7, cellPadding: 1.5, alignment: 'center' },
-                headStyles: { fillColor: [37, 99, 235] }, theme: 'grid',
-                didParseCell: function(data) {
-                    if (data.row.index === pdfRows.length - 1) {
-                        data.cell.styles.fontStyle = 'bold';
-                        data.cell.styles.fillColor = [241, 245, 249];
-                        return;
-                    }
-                    let totalStr = pdfRows[data.row.index][13];
-                    if(totalStr === "0.00 DH") {
-                        data.cell.styles.fillColor = [254, 226, 226]; 
-                        data.cell.styles.textColor = [153, 27, 27];
-                        return;
-                    }
-                    let txt = data.cell.text[0];
-                    if(txt === "50,00") {
-                        data.cell.styles.fillColor = [220, 252, 231]; 
-                        data.cell.styles.textColor = [21, 128, 61];
-                        data.cell.styles.fontStyle = 'bold';
-                    } else if(txt === "00,00") {
-                        data.cell.styles.fillColor = [255, 237, 213]; 
-                        data.cell.styles.textColor = [194, 65, 12];
-                    }
-                }
-            });
-
-            // PAGE II: FIXED AND EXTENDED EXPENSES SPREADSHEET (HIGHLY DETAILED)
-            doc.addPage();
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(12);
-            doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
-            
-            doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-            doc.text("PAGE II : VENTILATION ANALYTIQUE ET AUDIT DES CHARGES PAR NATURE DE SERVICE (MASARIF)", 12, 26);
-
-            // Re-engineering header to present isolated distinct column tracks
-            let expHeaders = ["Période", "Électricité (DH)", "Nettoyage (DH)", "Produits (DH)", "Balayage (DH)", "Exceptionnel (DH)", "Nature Charge Spec.", "Total Mensuel"];
-            
-            let filteredExp = db.expenses.filter(e => e.year == yr);
-            let totalFixedSums = { elec:0, clean:0, prod:0, ext:0, spec:0 };
-
-            let expRows = filteredExp.map(e => {
-                totalFixedSums.elec += (e.services.elec || 0);
-                totalFixedSums.clean += (e.services.clean || 0);
-                totalFixedSums.prod += (e.services.prod || 0);
-                totalFixedSums.ext += (e.services.ext || 0);
-                totalFixedSums.spec += (e.special.amt || 0);
-
-                return [
-                    `${e.month} ${e.year}`,
-                    (e.services.elec || 0).toFixed(2),
-                    (e.services.clean || 0).toFixed(2),
-                    (e.services.prod || 0).toFixed(2),
-                    (e.services.ext || 0).toFixed(2),
-                    (e.special.amt || 0).toFixed(2),
-                    e.special.type || "-",
-                    `${e.total.toFixed(2)} DH`
-                ];
-            });
-
-            // Add comprehensive structural bottom totals line calculations context
-            let overallExpensesSum = Object.values(totalFixedSums).reduce((a,b)=>a+b,0);
-            expRows.push([
-                "Total Cumulé",
-                totalFixedSums.elec.toFixed(2),
-                totalFixedSums.clean.toFixed(2),
-                totalFixedSums.prod.toFixed(2),
-                totalFixedSums.ext.toFixed(2),
-                totalFixedSums.spec.toFixed(2),
-                "Audit global",
-                `${overallExpensesSum.toFixed(2)} DH`
-            ]);
-
-            doc.autoTable({
-                startY: 30,
-                head: [expHeaders],
-                body: expRows.length > 1 ? expRows : [["Aucune charge comptabilisée pour cet exercice", "0.00", "0.00", "0.00", "0.00", "0.00", "-", "0.00 DH"]],
-                headStyles: { fillColor: [225, 29, 72] }, 
-                theme: 'grid',
-                styles: { fontSize: 8, cellPadding: 2, alignment: 'center' },
-                didParseCell: function(data) {
-                    if (data.row.index === expRows.length - 1) {
-                        data.cell.styles.fontStyle = 'bold';
-                        data.cell.styles.fillColor = [254, 242, 242]; // Light rose background accent line tracking metrics
-                        data.cell.styles.textColor = [153, 27, 27];
-                    }
-                }
-            });
-
-            doc.save(`Rapport_Syndic_Andalous4_${yr}.pdf`);
-        }
-    </script>
+// ---- PDF ----
+function doPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF('l','mm','a4');
+  const yr=document.getElementById("exy").value||getY();buildY(yr);
+  doc.setFillColor(15,23,42);doc.rect(0,0,297,18,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont("Helvetica","bold");
+  doc.text(`ANDALOUS AL RAHMA 4 · CAISSE DU SYNDIC (${yr})`,12,11);
+  doc.setTextColor(15,23,42);doc.setFontSize(9);
+  doc.text("PAGE I : SUIVI DES COTISATIONS MENSUELLES",12,26);
+  let hd=["Appartement",...MO.map(m=>m.substring(0,4)+'.'),"Total"];
+  let rows=[];let ms=Array(12).fill(0);
+  for(let a=1;a<=25;a++){
+    let row=[`Apt ${a}`],s=0;
+    for(let m=0;m<12;m++){const v=db.incomes[yr][a][m];if(v===50){row.push("50");s+=50;ms[m]+=50;}else if(v===0)row.push("0");else row.push("—");}
+    row.push(s.toFixed(2));rows.push(row);
+  }
+  rows.push(["Total",...ms.map(v=>v.toFixed(2)),ms.reduce((a,b)=>a+b,0).toFixed(2)]);
+  doc.autoTable({startY:30,head:[hd],body:rows,styles:{fontSize:6.5,cellPadding:1.4,halign:'center'},headStyles:{fillColor:[37,99,235]},theme:'grid',
+    didParseCell(d){
+      if(d.row.index===rows.length-1){d.cell.styles.fontStyle='bold';d.cell.styles.fillColor=[241,245,249];return;}
+      const t=d.cell.text[0];
+      if(t==="50"){d.cell.styles.fillColor=[220,252,231];d.cell.styles.textColor=[21,128,61];d.cell.styles.fontStyle='bold';}
+      else if(t==="0"){d.cell.styles.fillColor=[255,237,213];d.cell.styles.textColor=[194,65,12];}
+    }
+  });
+  doc.addPage();
+  doc.setFillColor(15,23,42);doc.rect(0,0,297,18,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(11);
+  doc.text(`ANDALOUS AL RAHMA 4 · CAISSE DU SYNDIC (${yr})`,12,11);
+  doc.setTextColor(15,23,42);doc.setFontSize(9);
+  doc.text("PAGE II : VENTILATION DES CHARGES ET DÉPENSES",12,26);
+  const fexp=db.expenses.filter(e=>e.year==yr);
+  let sums={elec:0,clean:0,prod:0,ext:0,spec:0};
+  let er=fexp.map(e=>{
+    sums.elec+=(e.services.elec||0);sums.clean+=(e.services.clean||0);
+    sums.prod+=(e.services.prod||0);sums.ext+=(e.services.ext||0);sums.spec+=(e.special.amt||0);
+    return[`${e.month} ${e.year}`,(e.services.elec||0).toFixed(2),(e.services.clean||0).toFixed(2),(e.services.prod||0).toFixed(2),(e.services.ext||0).toFixed(2),(e.special.amt||0).toFixed(2),e.special.type||"—",e.total.toFixed(2)+" DH"];
+  });
+  const tot=Object.values(sums).reduce((a,b)=>a+b,0);
+  er.push(["Total",sums.elec.toFixed(2),sums.clean.toFixed(2),sums.prod.toFixed(2),sums.ext.toFixed(2),sums.spec.toFixed(2),"—",tot.toFixed(2)+" DH"]);
+  doc.autoTable({startY:30,head:[["Période","Électricité","Nettoyage","Produits","Balayage","Exceptionnel","Nature","Total"]],
+    body:er.length>1?er:[["Aucune charge","0.00","0.00","0.00","0.00","0.00","—","0.00 DH"]],
+    headStyles:{fillColor:[220,38,38]},theme:'grid',styles:{fontSize:8,cellPadding:2,halign:'center'},
+    didParseCell(d){if(d.row.index===er.length-1){d.cell.styles.fontStyle='bold';d.cell.styles.fillColor=[254,242,242];d.cell.styles.textColor=[153,27,27];}}
+  });
+  doc.save(`Rapport_Syndic_AR4_${yr}.pdf`);
+  toast("Rapport PDF généré ✓","ok");
+}
+</script>
 </body>
 </html>
