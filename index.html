@@ -4,279 +4,222 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syndic - Andalous Al Rahma 4</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries for Excel & PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .month-checkbox:checked + label {
+        .month-btn:checked + label {
             background-color: #2563eb;
             color: white;
             border-color: #2563eb;
+        }
+        .non-payer-btn:checked + label {
+            background-color: #e11d48;
+            color: white;
+            border-color: #e11d48;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .accordion-open .accordion-content {
+            max-height: 2000px;
+            padding: 1.5rem;
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <div id="login-screen" class="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-blue-900 to-slate-900">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="login-screen" class="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-slate-900 to-blue-900">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
                     <i class="fa-solid fa-building-shield"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-slate-900">Syndic Application</h1>
-                <p class="text-sm text-slate-500 mt-1">Andalous Al Rahma - Grp 4 - Imb 4</p>
+                <p class="text-sm text-slate-500 mt-1">Andalous Al Rahma 4 - Grp 4 - Imb 4</p>
             </div>
-            
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Identifiant</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="username" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                        <input type="text" id="username" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Mot de passe</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="password" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                        <input type="password" id="password" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                 </div>
-                <div id="login-error" class="text-red-500 text-sm hidden text-center font-medium bg-red-50 p-2 rounded-lg">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Identifiants incorrects.
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-0.5">
-                    Se connecter
-                </button>
+                <div id="login-error" class="text-red-500 text-sm hidden text-center font-medium bg-red-50 p-2 rounded-lg">Identifiants incorrects.</div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg transition-all">Se connecter</button>
             </form>
         </div>
     </div>
 
+    <!-- ================= MAIN APP SCREEN ================= -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col">
         <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <span class="bg-blue-600 text-white p-2 rounded-xl text-lg font-bold shadow-md shadow-blue-500/20">AR4</span>
+                    <span class="bg-blue-600 text-white p-2 rounded-xl text-lg font-bold">AR4</span>
                     <div>
-                        <h2 class="text-md font-bold text-slate-900 leading-tight">Andalous Al Rahma 4</h2>
+                        <h2 class="text-md font-bold text-slate-900">Andalous Al Rahma 4</h2>
                         <p class="text-xs text-slate-500">Groupe 4 - Immeuble 4</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-user-check mr-1.5 text-blue-600"></i>asaber</span>
-                    <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600 p-2 rounded-lg hover:bg-slate-50 transition-colors" title="Déconnexion">
-                        <i class="fa-solid fa-right-from-bracket text-lg"></i>
-                    </button>
+                    <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600 p-2 rounded-lg transition-colors"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
                 </div>
             </div>
         </header>
 
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-xl text-white relative overflow-hidden">
-                    <div class="absolute right-4 bottom-2 text-white/10 text-7xl font-bold"><i class="fa-solid fa-wallet"></i></div>
-                    <p class="text-sm font-medium text-white/80 uppercase tracking-wider">Total des Cotisations</p>
-                    <p id="dash-total-incomes" class="text-3xl font-bold mt-2">0.00 DH</p>
-                </div>
-                <div class="bg-gradient-to-br from-rose-500 to-orange-600 p-6 rounded-2xl shadow-xl text-white relative overflow-hidden">
-                    <div class="absolute right-4 bottom-2 text-white/10 text-7xl font-bold"><i class="fa-solid fa-receipt"></i></div>
-                    <p class="text-sm font-medium text-white/80 uppercase tracking-wider">Total des Dépenses</p>
-                    <p id="dash-total-expenses" class="text-3xl font-bold mt-2">0.00 DH</p>
-                </div>
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl shadow-xl text-white relative overflow-hidden">
-                    <div class="absolute right-4 bottom-2 text-white/10 text-7xl font-bold"><i class="fa-solid fa-scale-balanced"></i></div>
-                    <p class="text-sm font-medium text-white/80 uppercase tracking-wider">Solde Actuel</p>
-                    <p id="dash-balance" class="text-3xl font-bold mt-2">0.00 DH</p>
-                </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
-                <div class="flex items-center space-x-2 text-slate-600">
-                    <i class="fa-solid fa-database text-blue-600"></i>
-                    <span class="text-sm font-semibold">Gestion des fichiers & Rapports</span>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center shadow-md shadow-amber-500/10">
-                        <i class="fa-solid fa-file-import mr-2"></i> Importer base JSON
-                        <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
-                    </label>
-                    <button onclick="exportDataJSON()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center shadow-md shadow-slate-700/10">
-                        <i class="fa-solid fa-file-export mr-2"></i> Exporter base JSON
-                    </button>
-                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center shadow-md shadow-emerald-600/10">
-                        <i class="fa-solid fa-file-excel mr-2"></i> Télécharger EXCEL
-                    </button>
-                    <button onclick="generatePDFReport()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center shadow-md shadow-rose-600/10">
-                        <i class="fa-solid fa-file-pdf mr-2"></i> Générer Rapport PDF
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                    <div class="border-b border-slate-100 pb-4 flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-lg"><i class="fa-solid fa-arrow-down-long"></i></span>
-                            <h3 class="text-lg font-bold text-slate-900">Section I : Les Mandahel (Madahel)</h3>
-                        </div>
-                        <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full">Tarif Fixe: 50 DH/Mois</span>
+            <!-- ================= TABLEAU DE BORD (Always Visible) ================= -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="flex flex-wrap gap-4 items-center justify-between border-b border-slate-100 pb-4">
+                    <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-chart-pie text-blue-600 mr-2"></i>Tableau de Bord</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center">
+                            <i class="fa-solid fa-file-excel mr-2"></i> Importer / Charger fichier EXCEL
+                            <input type="file" id="import-excel" class="hidden" accept=".xlsx" onchange="importFromExcel(event)">
+                        </label>
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm"><i class="fa-solid fa-download mr-2"></i>Télécharger EXCEL</button>
+                        <button onclick="generatePDFReport()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm"><i class="fa-solid fa-file-pdf mr-2"></i>Générer PDF Pro</button>
                     </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-xl">
+                        <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Total des Cotisations</p>
+                        <p id="dash-total-incomes" class="text-2xl font-bold text-emerald-900 mt-1">0.00 DH</p>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200 p-5 rounded-xl">
+                        <p class="text-xs font-semibold text-rose-700 uppercase tracking-wider">Total des Dépenses</p>
+                        <p id="dash-total-expenses" class="text-2xl font-bold text-rose-900 mt-1">0.00 DH</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl">
+                        <p class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Solde de la Caisse</p>
+                        <p id="dash-balance" class="text-2xl font-bold text-blue-900 mt-1">0.00 DH</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- ================= SECTION 1: COTISATIONS (Accordion) ================= -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden accordion-item" id="sec-cotisations">
+                <button onclick="toggleAccordion('sec-cotisations')" class="w-full flex items-center justify-between p-5 font-bold text-left bg-slate-50 hover:bg-slate-100/80 transition-colors text-slate-900 border-b border-slate-100">
+                    <span class="flex items-center"><i class="fa-solid fa-wallet text-emerald-600 mr-3"></i>Section I : Gestion des Cotisations (المداخيل)</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200 btn-arrow"></i>
+                </button>
+                <div class="accordion-content bg-white">
                     <form id="income-form" onsubmit="saveIncome(event)" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">N° Appartement (1 - 25)</label>
-                                <select id="inc-app-num" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">N° Appartement (1 - 25)</label>
+                                <select id="inc-app-num" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none"></select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Année</label>
-                                <select id="inc-year" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2026" selected>2026</option>
-                                    <option value="2027">2027</option>
-                                    <option value="2028">2028</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sélectionner les Mois (Choix Multiple)</label>
-                            <div id="months-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                                </div>
-                        </div>
-
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center justify-center">
-                            <i class="fa-solid fa-plus-circle mr-2"></i> Enregistrer la cotisation
-                        </button>
-                    </form>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Statistiques de cette section</h4>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-600">Membres cotisés ce mois:</span>
-                            <span id="inc-stat-month" class="font-semibold text-slate-900">0.00 DH</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-600">Total cumulé de l'année sélectionnée:</span>
-                            <span id="inc-stat-year" class="font-semibold text-slate-900">0.00 DH</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                    <div class="border-b border-slate-100 pb-4 flex items-center space-x-2.5">
-                        <span class="p-2 bg-rose-50 text-rose-600 rounded-lg text-lg"><i class="fa-solid fa-arrow-up-long"></i></span>
-                        <h3 class="text-lg font-bold text-slate-900">Section II : Les Dépenses (Masarif)</h3>
-                    </div>
-
-                    <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-5">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mois de la dépense</label>
-                                <select id="exp-month" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    <option value="Janvier">Janvier</option><option value="Février">Février</option>
-                                    <option value="Mars">Mars</option><option value="Avril">Avril</option>
-                                    <option value="Mai">Mai</option><option value="Juin" selected>Juin</option>
-                                    <option value="Juillet">Juillet</option><option value="Août">Août</option>
-                                    <option value="Septembre">Septembre</option><option value="Octobre">Octobre</option>
-                                    <option value="Novembre">Novembre</option><option value="Décembre">Décembre</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Année</label>
-                                <select id="exp-year" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Année</label>
+                                <select id="inc-year" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none">
                                     <option value="2024">2024</option><option value="2025">2025</option>
                                     <option value="2026" selected>2026</option><option value="2027">2027</option>
                                 </select>
                             </div>
                         </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Services Mensuels Standards</label>
-                            <div class="grid grid-cols-1 gap-2">
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <label class="inline-flex items-center text-sm font-medium text-slate-700 cursor-pointer">
-                                        <input type="checkbox" id="srv-elec" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 mr-2" onchange="toggleSrvInput('srv-elec-amt')"> Électricité (الكهرباء)
-                                    </label>
-                                    <input type="number" id="srv-elec-amt" disabled placeholder="Montant DH" class="w-32 bg-white border border-slate-200 rounded-lg p-1.5 text-right text-sm disabled:bg-slate-100 disabled:text-slate-400">
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <label class="inline-flex items-center text-sm font-medium text-slate-700 cursor-pointer">
-                                        <input type="checkbox" id="srv-clean" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 mr-2" onchange="toggleSrvInput('srv-clean-amt')"> Nettoyage Escaliers (النظافة)
-                                    </label>
-                                    <input type="number" id="srv-clean-amt" disabled placeholder="Montant DH" class="w-32 bg-white border border-slate-200 rounded-lg p-1.5 text-right text-sm disabled:bg-slate-100 disabled:text-slate-400">
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <label class="inline-flex items-center text-sm font-medium text-slate-700 cursor-pointer">
-                                        <input type="checkbox" id="srv-prod" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 mr-2" onchange="toggleSrvInput('srv-prod-amt')"> Matériel de Nettoyage (مواد التنظيف)
-                                    </label>
-                                    <input type="number" id="srv-prod-amt" disabled placeholder="Montant DH" class="w-32 bg-white border border-slate-200 rounded-lg p-1.5 text-right text-sm disabled:bg-slate-100 disabled:text-slate-400">
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <label class="inline-flex items-center text-sm font-medium text-slate-700 cursor-pointer">
-                                        <input type="checkbox" id="srv-ext" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 mr-2" onchange="toggleSrvInput('srv-ext-amt')"> Balayage Extérieur (التشطيب الخارجي)
-                                    </label>
-                                    <input type="number" id="srv-ext-amt" disabled placeholder="Montant DH" class="w-32 bg-white border border-slate-200 rounded-lg p-1.5 text-right text-sm disabled:bg-slate-100 disabled:text-slate-400">
-                                </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Sélection des statuts par mois (Cotisé <span class="text-blue-600">●</span> / Non Cotisé <span class="text-rose-600">●</span>)</label>
+                            <div id="months-status-container" class="space-y-2">
+                                <!-- Generated Dynamically with double options -->
                             </div>
                         </div>
-
-                        <div class="p-4 bg-amber-50/50 border border-amber-200/60 rounded-xl space-y-3">
-                            <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Dépenses Exceptionnelles (Masarif Istithna'iya)</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <input type="text" id="exp-spec-type" placeholder="Type / Nature de dépense" class="sm:col-span-2 bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                <input type="number" id="exp-spec-amt" placeholder="Montant DH" class="bg-white border border-slate-200 rounded-xl p-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            </div>
-                        </div>
-
-                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-rose-600/10 transition-all flex items-center justify-center">
-                            <i class="fa-solid fa-check-double mr-2"></i> Valider les dépenses du mois
-                        </button>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-all shadow-sm"><i class="fa-solid fa-plus mr-2"></i>Enregistrer la cotisation</button>
                     </form>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Statistiques de cette section</h4>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-600">Total dépenses du mois sélectionné:</span>
-                            <span id="exp-stat-month" class="font-semibold text-slate-900">0.00 DH</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-600">Cumul annuel des dépenses (Année choisie):</span>
-                            <span id="exp-stat-year" class="font-semibold text-slate-900">0.00 DH</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 class="font-bold text-slate-800 flex items-center"><i class="fa-solid fa-list-check text-blue-600 mr-2.5"></i> Historique global des transactions insérées</h3>
-                    <div class="text-xs text-slate-500">Sauvegarde automatique active</div>
+            <!-- ================= SECTION 2: DEPENSES (Accordion) ================= -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden accordion-item" id="sec-depenses">
+                <button onclick="toggleAccordion('sec-depenses')" class="w-full flex items-center justify-between p-5 font-bold text-left bg-slate-50 hover:bg-slate-100/80 transition-colors text-slate-900 border-b border-slate-100">
+                    <span class="flex items-center"><i class="fa-solid fa-receipt text-rose-600 mr-3"></i>Section II : Gestion des Dépenses (المصاريف)</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200 btn-arrow"></i>
+                </button>
+                <div class="accordion-content bg-white">
+                    <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Mois de la dépense</label>
+                                <select id="exp-month" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Année</label>
+                                <select id="exp-year" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none">
+                                    <option value="2024">2024</option><option value="2025">2025</option>
+                                    <option value="2026" selected>2026</option><option value="2027">2027</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Services Fixes Mensuels</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="services-container">
+                                <!-- Service items checkboxes with input values -->
+                            </div>
+                        </div>
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                            <label class="block text-xs font-bold text-amber-800 uppercase">Dépenses Exceptionnelles</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <input type="text" id="exp-spec-type" placeholder="Type / Nature de dépense" class="sm:col-span-2 bg-white border border-slate-200 rounded-xl p-2.5 text-sm">
+                                <input type="number" id="exp-spec-amt" placeholder="Montant DH" class="bg-white border border-slate-200 rounded-xl p-2.5 text-sm text-right">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 rounded-xl transition-all shadow-sm"><i class="fa-solid fa-check mr-2"></i>Valider les dépenses du mois</button>
+                    </form>
                 </div>
-                <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            </div>
+
+            <!-- ================= SECTION 3: VISUAL TABLES & ACTIONS (Accordion) ================= -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden accordion-item" id="sec-tables">
+                <button onclick="toggleAccordion('sec-tables')" class="w-full flex items-center justify-between p-5 font-bold text-left bg-slate-50 hover:bg-slate-100/80 transition-colors text-slate-900 border-b border-slate-100">
+                    <span class="flex items-center"><i class="fa-solid fa-list-check text-blue-600 mr-3"></i>Visualisation, Modification et Suppression des Données</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200 btn-arrow"></i>
+                </button>
+                <div class="accordion-content bg-white space-y-6">
                     <div>
-                        <h4 class="text-sm font-bold text-emerald-700 mb-2"><i class="fa-solid fa-circle-dot mr-1"></i> Récapitulatif Direct Madahel</h4>
-                        <div class="overflow-x-auto max-h-60 overflow-y-auto border border-slate-100 rounded-xl text-xs">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-emerald-700"><i class="fa-solid fa-circle-dot mr-1"></i>Registre des Cotisations</h4>
+                            <button onclick="clearAll('incomes')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 font-medium px-2.5 py-1 rounded-lg transition-colors"><i class="fa-solid fa-trash-can mr-1"></i>Vider tout le registre</button>
+                        </div>
+                        <div class="overflow-x-auto border border-slate-100 rounded-xl text-xs">
                             <table class="w-full text-left border-collapse" id="table-view-incomes">
-                                <thead class="bg-slate-100 sticky top-0">
-                                    <tr><th class="p-2">Appt</th><th class="p-2">Année</th><th class="p-2">Mois enregistrés</th><th class="p-2 text-right">Total</th></tr>
+                                <thead class="bg-slate-100">
+                                    <tr><th class="p-2.5">Appartement</th><th class="p-2.5">Année</th><th class="p-2.5">Mois Cotisés</th><th class="p-2.5">Mois Non Cotisés</th><th class="p-2.5 text-right">Total</th><th class="p-2.5 text-center">Action</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-sm font-bold text-rose-700 mb-2"><i class="fa-solid fa-circle-dot mr-1"></i> Récapitulatif Direct Masarif</h4>
-                        <div class="overflow-x-auto max-h-60 overflow-y-auto border border-slate-100 rounded-xl text-xs">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-rose-700"><i class="fa-solid fa-circle-dot mr-1"></i>Registre des Dépenses</h4>
+                            <button onclick="clearAll('expenses')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 font-medium px-2.5 py-1 rounded-lg transition-colors"><i class="fa-solid fa-trash-can mr-1"></i>Vider tout le registre</button>
+                        </div>
+                        <div class="overflow-x-auto border border-slate-100 rounded-xl text-xs">
                             <table class="w-full text-left border-collapse" id="table-view-expenses">
-                                <thead class="bg-slate-100 sticky top-0">
-                                    <tr><th class="p-2">Période</th><th class="p-2">Services Fixes</th><th class="p-2">Exceptionnels</th><th class="p-2 text-right">Total</th></tr>
+                                <thead class="bg-slate-100">
+                                    <tr><th class="p-2.5">Période</th><th class="p-2.5">Services Fixes (Détails)</th><th class="p-2.5">Exceptionnels</th><th class="p-2.5 text-right">Total</th><th class="p-2.5 text-center">Action</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100"></tbody>
                             </table>
@@ -287,377 +230,378 @@
         </main>
     </div>
 
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         const MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        const SERVICES_KEYS = [
+            { id: "elec", label: "Électricité (الكهرباء)" },
+            { id: "clean", label: "Nettoyage Escaliers (النظافة)" },
+            { id: "prod", label: "Matériel de Nettoyage (مواد التنظيف)" },
+            { id: "ext", label: "Balayage Extérieur (التشطيب الخارجي)" }
+        ];
         
-        // App Database Structure
-        let db = {
-            incomes: [],  // Format: { appNum: X, year: Y, months: [...], total: Z }
-            expenses: []  // Format: { month: M, year: Y, services: {elec: X, clean: Y...}, special: {type: A, amt: B}, total: Z }
-        };
+        let db = { incomes: [], expenses: [] };
 
-        // Initialize App UI
         document.addEventListener("DOMContentLoaded", () => {
-            generateApptOptions();
-            generateMonthCheckboxes();
-            loadFromLocalStorage();
-            
-            // Event listener for real-time calculations on select changes
-            document.getElementById('inc-year').addEventListener('change', updateStatsAndTables);
-            document.getElementById('exp-month').addEventListener('change', updateStatsAndTables);
-            document.getElementById('exp-year').addEventListener('change', updateStatsAndTables);
+            initAppUI();
+            updateStatsAndTables();
         });
 
-        function generateApptOptions() {
-            const select = document.getElementById("inc-app-num");
+        function initAppUI() {
+            // Appt list (1 to 25)
+            const apptSelect = document.getElementById("inc-app-num");
             for(let i = 1; i <= 25; i++) {
-                let opt = document.createElement("option");
-                opt.value = i; opt.innerText = `Appartement N° ${i}`;
-                select.appendChild(opt);
+                apptSelect.innerHTML += `<option value="${i}">Appartement ${i}</option>`;
             }
-        }
+            // Expense Month selector
+            const expMonthSelect = document.getElementById("exp-month");
+            MONTHS.forEach(m => expMonthSelect.innerHTML += `<option value="${m}">${m}</option>`);
 
-        function generateMonthCheckboxes() {
-            const container = document.getElementById("months-grid");
+            // Double Radio Option Dots (Cotisé / Non Cotisé)
+            const statusContainer = document.getElementById("months-status-container");
             MONTHS.forEach((m, idx) => {
-                let div = document.createElement("div");
-                div.className = "relative flex";
-                div.innerHTML = `
-                    <input type="checkbox" id="m-${idx}" value="${m}" class="month-checkbox hidden">
-                    <label for="m-${idx}" class="w-full text-center border border-slate-200 text-xs font-medium py-2 rounded-xl cursor-pointer select-none transition-all hover:bg-slate-100">
-                        ${m}
-                    </label>
+                statusContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                        <span class="font-medium text-slate-700">${m}</span>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <input type="radio" name="status-${idx}" id="payer-${idx}" value="payer" class="month-btn hidden">
+                                <label for="payer-${idx}" class="px-3 py-1 text-xs border border-slate-300 rounded-lg cursor-pointer select-none font-semibold text-slate-600 transition-colors">Cotisé (50 DH)</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" name="status-${idx}" id="nonpayer-${idx}" value="nonpayer" class="non-payer-btn hidden">
+                                <label for="nonpayer-${idx}" class="px-3 py-1 text-xs border border-slate-300 rounded-lg cursor-pointer select-none font-semibold text-slate-600 transition-colors">Non Cotisé (Refus/Retard)</label>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                container.appendChild(div);
+            });
+
+            // Expense fixed items
+            const srvContainer = document.getElementById("services-container");
+            SERVICES_KEYS.forEach(s => {
+                srvContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="inline-flex items-center text-xs font-medium text-slate-700 cursor-pointer">
+                            <input type="checkbox" id="chk-${s.id}" class="rounded border-slate-300 text-blue-600 h-4 w-4 mr-2" onchange="document.getElementById('amt-${s.id}').disabled = !this.checked"> ${s.label}
+                        </label>
+                        <input type="number" id="amt-${s.id}" disabled placeholder="Montant DH" class="w-28 bg-white border border-slate-200 rounded-lg p-1.5 text-right text-xs">
+                    </div>
+                `;
             });
         }
 
-        function toggleSrvInput(id) {
-            const input = document.getElementById(id);
-            input.disabled = !input.disabled;
-            if (input.disabled) input.value = '';
-            else input.focus();
-        }
-
-        // --- AUTHENTICATION LOGIC ---
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById("username").value;
-            const pass = document.getElementById("password").value;
+        // --- ACCORDION CORE ENGINE ---
+        function toggleAccordion(id) {
+            const item = document.getElementById(id);
+            const isOpen = item.classList.contains("accordion-open");
             
-            if(user === "asaber" && pass === "Al@e16Lokmn23") {
-                document.getElementById("login-screen").classList.add("hidden");
-                document.getElementById("app-screen").classList.remove("hidden");
-                updateStatsAndTables();
-            } else {
-                const err = document.getElementById("login-error");
-                err.classList.remove("hidden");
-                setTimeout(() => err.classList.add("hidden"), 4000);
+            // Close all first to maintain professional look
+            document.querySelectorAll(".accordion-item").forEach(el => {
+                el.classList.remove("accordion-open");
+                el.querySelector(".btn-arrow").style.transform = "rotate(0deg)";
+            });
+
+            if (!isOpen) {
+                item.classList.add("accordion-open");
+                item.querySelector(".btn-arrow").style.transform = "rotate(180deg)";
             }
         }
 
+        // --- AUTHENTICATION ---
+        function handleLogin(e) {
+            e.preventDefault();
+            if(document.getElementById("username").value === "asaber" && document.getElementById("password").value === "Al@e16Lokmn23") {
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("app-screen").classList.remove("hidden");
+            } else {
+                document.getElementById("login-error").classList.remove("hidden");
+            }
+        }
         function handleLogout() {
             document.getElementById("app-screen").classList.add("hidden");
             document.getElementById("login-screen").classList.remove("hidden");
             document.getElementById("login-form").reset();
         }
 
-        // --- INCOMES HANDLERS ---
+        // --- SUBMIT INCOME ---
         function saveIncome(e) {
             e.preventDefault();
             const appNum = parseInt(document.getElementById("inc-app-num").value);
             const year = parseInt(document.getElementById("inc-year").value);
             
-            let selectedMonths = [];
+            let payed = [];
+            let nonPayed = [];
+
             MONTHS.forEach((m, idx) => {
-                if(document.getElementById(`m-${idx}`).checked) selectedMonths.push(m);
+                let pRadio = document.getElementById(`payer-${idx}`);
+                let npRadio = document.getElementById(`nonpayer-${idx}`);
+                if(pRadio.checked) payed.push(m);
+                if(npRadio.checked) nonPayed.push(m);
             });
 
-            if(selectedMonths.length === 0) {
-                alert("Veuillez sélectionner au moins un mois.");
-                return;
+            if(payed.length === 0 && nonPayed.length === 0) {
+                alert("Veuillez cocher au moins un statut mensuel."); return;
             }
 
-            const totalAmount = selectedMonths.length * 50;
-
-            // Remove previous registry for same app/year if exists to update it cleanly
             db.incomes = db.incomes.filter(i => !(i.appNum === appNum && i.year === year));
-
-            db.incomes.push({ appNum, year, months: selectedMonths, total: totalAmount });
-            saveToLocalStorage();
-            updateStatsAndTables();
+            db.incomes.push({ appNum, year, payed, nonPayed, total: payed.length * 50 });
             
-            // Reset checkboxes
-            MONTHS.forEach((m, idx) => document.getElementById(`m-${idx}`).checked = false);
-            alert("Cotisation insérée avec succès.");
+            updateStatsAndTables();
+            MONTHS.forEach((m, idx) => {
+                document.getElementById(`payer-${idx}`).checked = false;
+                document.getElementById(`nonpayer-${idx}`).checked = false;
+            });
+            alert("Cotisations de l'unité mises à jour.");
         }
 
-        // --- EXPENSES HANDLERS ---
+        // --- SUBMIT EXPENSE ---
         function saveExpense(e) {
             e.preventDefault();
             const month = document.getElementById("exp-month").value;
             const year = parseInt(document.getElementById("exp-year").value);
 
-            let services = {
-                elec: parseFloat(document.getElementById("srv-elec-amt").value) || 0,
-                clean: parseFloat(document.getElementById("srv-clean-amt").value) || 0,
-                products: parseFloat(document.getElementById("srv-prod-amt").value) || 0,
-                exterior: parseFloat(document.getElementById("srv-ext-amt").value) || 0
-            };
+            let services = {};
+            SERVICES_KEYS.forEach(s => {
+                services[s.id] = document.getElementById(`chk-${s.id}`).checked ? (parseFloat(document.getElementById(`amt-${s.id}`).value) || 0) : 0;
+            });
 
             let special = {
                 type: document.getElementById("exp-spec-type").value || "Aucun",
                 amt: parseFloat(document.getElementById("exp-spec-amt").value) || 0
             };
 
-            let total = Object.values(services).reduce((a,b) => a+b, 0) + special.amt;
+            let total = Object.values(services).reduce((a,b)=>a+b,0) + special.amt;
 
-            if(total === 0) {
-                alert("Le montant de dépenses doit être supérieur à 0.");
-                return;
-            }
-
-            // Clean older entry for same month/year
             db.expenses = db.expenses.filter(ex => !(ex.month === month && ex.year === year));
-
             db.expenses.push({ month, year, services, special, total });
-            saveToLocalStorage();
+            
             updateStatsAndTables();
-
-            // Reset inputs
             document.getElementById("expense-form").reset();
-            ["srv-elec-amt","srv-clean-amt","srv-prod-amt","srv-ext-amt"].forEach(id => document.getElementById(id).disabled = true);
-            alert("Dépenses validées et stockées.");
+            SERVICES_KEYS.forEach(s => document.getElementById(`amt-${s.id}`).disabled = true);
+            alert("Dépenses enregistrées.");
         }
 
-        // --- ENGINE STATS CALCULATIONS & TABLES REFRESH ---
+        // --- CALCULATION ENGINE & LIVE TABLE RENDERING ---
         function updateStatsAndTables() {
-            const currentIncYear = parseInt(document.getElementById("inc-year").value);
-            const currentExpMonth = document.getElementById("exp-month").value;
-            const currentExpYear = parseInt(document.getElementById("exp-year").value);
-
-            // 1. Dashboard calculations
-            let totalIn = db.incomes.reduce((acc, curr) => acc + curr.total, 0);
-            let totalOut = db.expenses.reduce((acc, curr) => acc + curr.total, 0);
+            let totalIn = db.incomes.reduce((a, b) => a + b.total, 0);
+            let totalOut = db.expenses.reduce((a, b) => a + b.total, 0);
             
             document.getElementById("dash-total-incomes").innerText = `${totalIn.toFixed(2)} DH`;
             document.getElementById("dash-total-expenses").innerText = `${totalOut.toFixed(2)} DH`;
             document.getElementById("dash-balance").innerText = `${(totalIn - totalOut).toFixed(2)} DH`;
 
-            // 2. Section I Stats (Incomes)
-            let incYearTotal = db.incomes.filter(i => i.year === currentIncYear).reduce((acc, curr) => acc + curr.total, 0);
-            document.getElementById("inc-stat-month").innerText = `${(db.incomes.filter(i => i.year === currentIncYear).length * 50).toFixed(2)} DH (Moy)`;
-            document.getElementById("inc-stat-year").innerText = `${incYearTotal.toFixed(2)} DH`;
-
-            // 3. Section II Stats (Expenses)
-            let expMonthObj = db.expenses.find(e => e.month === currentExpMonth && e.year === currentExpYear);
-            let expMonthTotal = expMonthObj ? expMonthObj.total : 0;
-            let expYearTotal = db.expenses.filter(e => e.year === currentExpYear).reduce((acc,curr) => acc + curr.total, 0);
-
-            document.getElementById("exp-stat-month").innerText = `${expMonthTotal.toFixed(2)} DH`;
-            document.getElementById("exp-stat-year").innerText = `${expYearTotal.toFixed(2)} DH`;
-
-            // 4. Render Table Views
-            renderTableIncomes();
-            renderTableExpenses();
-        }
-
-        function renderTableIncomes() {
-            const tbody = document.querySelector("#table-view-incomes tbody");
-            tbody.innerHTML = "";
-            db.incomes.sort((a,b) => b.year - a.year || a.appNum - b.appNum).forEach(i => {
-                let row = `<tr>
-                    <td class="p-2 font-medium">Appt ${i.appNum}</td>
+            // Render Income Records
+            const tbodyInc = document.querySelector("#table-view-incomes tbody");
+            tbodyInc.innerHTML = "";
+            db.incomes.forEach((i, idx) => {
+                tbodyInc.innerHTML += `<tr>
+                    <td class="p-2 font-semibold">Appartement ${i.appNum}</td>
                     <td class="p-2">${i.year}</td>
-                    <td class="p-2 text-slate-500 max-w-[150px] truncate" title="${i.months.join(', ')}">${i.months.join(', ')}</td>
-                    <td class="p-2 text-right font-semibold text-emerald-600">${i.total.toFixed(2)} DH</td>
+                    <td class="p-2 text-blue-600 font-medium max-w-[120px] truncate">${i.payed.join(', ') || '-'}</td>
+                    <td class="p-2 text-rose-600 font-medium max-w-[120px] truncate">${i.nonPayed.join(', ') || '-'}</td>
+                    <td class="p-2 text-right font-bold text-emerald-600">${i.total.toFixed(2)} DH</td>
+                    <td class="p-2 text-center"><button onclick="deleteRow('incomes', ${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can"></i></button></td>
                 </tr>`;
-                tbody.innerHTML += row;
+            });
+
+            // Render Expense Records
+            const tbodyExp = document.querySelector("#table-view-expenses tbody");
+            tbodyExp.innerHTML = "";
+            db.expenses.forEach((e, idx) => {
+                let fStr = Object.entries(e.services).map(([k,v]) => `${k}:${v}DH`).join(' | ');
+                tbodyExp.innerHTML += `<tr>
+                    <td class="p-2 font-semibold">${e.month} ${e.year}</td>
+                    <td class="p-2 text-slate-500 max-w-[200px] truncate">${fStr}</td>
+                    <td class="p-2 text-slate-500">${e.special.amt} DH (${e.special.type})</td>
+                    <td class="p-2 text-right font-bold text-rose-600">${e.total.toFixed(2)} DH</td>
+                    <td class="p-2 text-center"><button onclick="deleteRow('expenses', ${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can"></i></button></td>
+                </tr>`;
             });
         }
 
-        function renderTableExpenses() {
-            const tbody = document.querySelector("#table-view-expenses tbody");
-            tbody.innerHTML = "";
-            db.expenses.sort((a,b) => b.year - a.year).forEach(e => {
-                let totalFixe = Object.values(e.services).reduce((a,b)=>a+b, 0);
-                let row = `<tr>
-                    <td class="p-2 font-medium">${e.month} ${e.year}</td>
-                    <td class="p-2 text-slate-500">${totalFixe.toFixed(2)} DH</td>
-                    <td class="p-2 text-slate-500">${e.special.amt.toFixed(2)} DH <span class="text-[10px]">(${e.special.type})</span></td>
-                    <td class="p-2 text-right font-semibold text-rose-600">${e.total.toFixed(2)} DH</td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
+        // --- LINE REMOVAL METHODS ---
+        function deleteRow(type, idx) {
+            if(confirm("Voulez-vous vraiment supprimer cette ligne de données ?")) {
+                db[type].splice(idx, 1);
+                updateStatsAndTables();
+            }
+        }
+        function clearAll(type) {
+            if(confirm(`Êtes-vous sûr de vouloir VIDER l'intégralité du registre des ${type === 'incomes' ? 'Cotisations' : 'Dépenses'} ?`)) {
+                db[type] = [];
+                updateStatsAndTables();
+            }
         }
 
-        // --- LOCAL STORAGE SYNC ---
-        function saveToLocalStorage() {
-            localStorage.setItem("syndic_db_rahma4", JSON.stringify(db));
-        }
-        function loadFromLocalStorage() {
-            let data = localStorage.getItem("syndic_db_rahma4");
-            if(data) db = JSON.parse(data);
-        }
-
-        // --- JSON BACKUP (IN & OUT) ---
-        function exportDataJSON() {
-            let blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = `backup_syndic_rahma4_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        }
-
-        function importData(e) {
-            let file = e.target.files[0];
-            if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let parsed = JSON.parse(evt.target.result);
-                    if(parsed.incomes && parsed.expenses) {
-                        db = parsed;
-                        saveToLocalStorage();
-                        updateStatsAndTables();
-                        alert("Base de données synchronisée avec succès !");
-                    } else { alert("Fichier JSON non conforme."); }
-                } catch(err) { alert("Erreur lors de la lecture du fichier."); }
-            };
-            reader.readAsText(file);
-        }
-
-        // --- EXCEL GENERATION METHOD ---
+        // ================= DIRECT EXCEL EXPORTS (AS REQUIRED MATRIX) =================
         function exportToExcel() {
             let wb = XLSX.utils.book_new();
-            
-            // Extract Unique Years present in database
             let years = [...new Set([...db.incomes.map(i=>i.year), ...db.expenses.map(e=>e.year)])];
-            if(years.length === 0) years = [new Date().getFullYear()];
+            if(years.length === 0) years = [2026];
 
             years.forEach(yr => {
-                // PAGE 1 : Incomes Structure Matrix for Year X
-                let sheetDataInc = [
-                    [`SOCIETE / COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - ANNEE ${yr}`],
-                    ["Suivi des Cotisations Mensuelles (Madahel) - 50 DH / Mois"],
-                    [],
-                    ["N° Appartement", ...MONTHS, "Total Annuel (DH)"]
-                ];
+                // PAGE 1 : Cotisations Matrix Layout Architecture
+                let matrixInc = [];
+                // Row 1: Banner Header
+                matrixInc.push([`SOCIETE / COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - COTISATIONS (MADAHEL) - ANNEE ${yr}`]);
+                // Row 2: Months Headers (Line index 1 inside Excel sheet array)
+                matrixInc.push(["N° Appartement", ...MONTHS, "Total Annuel (DH)"]);
 
+                let monthlySums = Array(12).fill(0);
+
+                // Build Appt Rows 1 to 25
                 for(let app = 1; app <= 25; app++) {
                     let row = [`Appartement ${app}`];
-                    let foundIncome = db.incomes.find(i => i.appNum === app && i.year === yr);
-                    let rowTotal = 0;
-                    
-                    MONTHS.forEach(m => {
-                        if(foundIncome && foundIncome.months.includes(m)) {
-                            row.push(50);
-                            rowTotal += 50;
-                        } else { row.push(0); }
+                    let match = db.incomes.find(i => i.appNum === app && i.year === yr);
+                    let appSum = 0;
+
+                    MONTHS.forEach((m, mIdx) => {
+                        if(match && match.payed.includes(m)) {
+                            row.push(50.00);
+                            appSum += 50.00;
+                            monthlySums[mIdx] += 50.00;
+                        } else if(match && match.nonPayed.includes(m)) {
+                            row.push("Non Cotisé");
+                        } else {
+                            row.push(0.00);
+                        }
                     });
-                    row.push(rowTotal);
-                    sheetDataInc.push(row);
+                    row.push(appSum); // Last element total
+                    matrixInc.push(row);
                 }
-                let wsInc = XLSX.utils.aoa_to_sheet(sheetDataInc);
-                XLSX.utils.book_append_sheet(wb, wsInc, `Madahel ${yr}`);
 
-                // PAGE 2 : Expenses Structure Matrix for Year X
-                let sheetDataExp = [
-                    [`SOCIETE / COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - ANNEE ${yr}`],
-                    ["Suivi Mensuel des Charges & Dépenses (Masarif)"],
-                    [],
-                    ["Mois", "Électricité", "Nettoyage Escaliers", "Matériel Nettoyage", "Balayage Extérieur", "Charges Exceptionnelles", "Nature Exceptionnel", "Total Mensuel (DH)"]
+                // Final Total Row
+                let finalTotalRow = ["Total Mensuel", ...monthlySums, monthlySums.reduce((a,b)=>a+b,0)];
+                matrixInc.push(finalTotalRow);
+
+                let wsInc = XLSX.utils.aoa_to_sheet(matrixInc);
+                XLSX.utils.book_append_sheet(wb, wsInc, `Cotisations ${yr}`);
+
+                // PAGE 2 : Expenses Layout Matrix
+                let matrixExp = [
+                    [`COMPTABILITE ET CHARGES (MASARIF) - ANNEE ${yr}`],
+                    ["Mois", "Électricité", "Nettoyage Escaliers", "Matériel Nettoyage", "Balayage Extérieur", "Exceptionnel", "Nature Exceptionnel", "Total Mensuel (DH)"]
                 ];
-
                 MONTHS.forEach(m => {
                     let ex = db.expenses.find(e => e.month === m && e.year === yr);
                     if(ex) {
-                        sheetDataExp.push([
-                            m, ex.services.elec, ex.services.clean, ex.services.products, ex.services.exterior, ex.special.amt, ex.special.type, ex.total
-                        ]);
+                        matrixExp.push([m, ex.services.elec, ex.services.clean, ex.services.products, ex.services.exterior, ex.special.amt, ex.special.type, ex.total]);
                     } else {
-                        sheetDataExp.push([m, 0, 0, 0, 0, 0, "Aucun", 0]);
+                        matrixExp.push([m, 0, 0, 0, 0, 0, "-", 0]);
                     }
                 });
-                let wsExp = XLSX.utils.aoa_to_sheet(sheetDataExp);
+                let wsExp = XLSX.utils.aoa_to_sheet(matrixExp);
                 XLSX.utils.book_append_sheet(wb, wsExp, `Masarif ${yr}`);
             });
 
-            XLSX.writeFile(wb, "Rapport_Syndic_Andalous_Al_Rahma_4.xlsx");
+            XLSX.writeFile(wb, `Comptabilite_Syndic_Immeuble4_${new Date().getFullYear()}.xlsx`);
         }
 
-        // --- PROFESSIONAL PDF GENERATION METHOD ---
+        // ================= EXCEL DATA INGESTION ENGINE =================
+        function importFromExcel(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = function(evt) {
+                try {
+                    let data = new Uint8Array(evt.target.result);
+                    let workbook = XLSX.read(data, { type: 'array' });
+                    
+                    db = { incomes: [], expenses: [] }; // Fresh state upload
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        let ws = workbook.Sheets[sheetName];
+                        let rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        
+                        if(sheetName.startsWith("Cotisations")) {
+                            let year = parseInt(sheetName.split(" ")[1]) || 2026;
+                            
+                            // Iterate over the appts rows from index 2 to 26 (matching appt 1 to 25)
+                            for(let i = 2; i <= 26; i++) {
+                                let r = rows[i];
+                                if(!r || r.length === 0) continue;
+                                let appNum = parseInt(r[0].replace(/[^0-9]/g, ''));
+                                if(!appNum) continue;
+
+                                let payed = [];
+                                let nonPayed = [];
+
+                                MONTHS.forEach((m, mIdx) => {
+                                    let val = r[mIdx + 1];
+                                    if(parseFloat(val) === 50) payed.push(m);
+                                    else if(val === "Non Cotisé") nonPayed.push(m);
+                                });
+
+                                db.incomes.push({ appNum, year, payed, nonPayed, total: payed.length * 50 });
+                            }
+                        } else if(sheetName.startsWith("Masarif")) {
+                            let year = parseInt(sheetName.split(" ")[1]) || 2026;
+                            for(let i = 2; i < rows.length; i++) {
+                                let r = rows[i];
+                                if(!r || r.length === 0 || r[0] === "Total") continue;
+                                let month = r[0];
+                                if(!MONTHS.includes(month)) continue;
+
+                                db.expenses.push({
+                                    month, year,
+                                    services: { elec: parseFloat(r[1])||0, clean: parseFloat(r[2])||0, products: parseFloat(r[3])||0, exterior: parseFloat(r[4])||0 },
+                                    special: { amt: parseFloat(r[5])||0, type: r[6] || "-" },
+                                    total: parseFloat(r[7])||0
+                                });
+                            }
+                        }
+                    });
+
+                    updateStatsAndTables();
+                    alert("Votre fichier Excel a été synchronisé avec succès ! Toutes les données sont injectées dans les sections.");
+                } catch(err) {
+                    alert("Erreur lors de la lecture du fichier Excel. Assurez-vous que c'est un fichier généré précédemment par cette application.");
+                }
+            };
+        }
+
+        // ================= PROFESSIONAL COMPLIANT PDF EXPORT =================
         function generatePDFReport() {
             const { jsPDF } = window.jspdf;
-            let doc = new jsPDF('p', 'mm', 'a4');
+            let doc = new jsPDF('l', 'mm', 'a4'); // Elegant Landscape design for 13 column layouts
             
-            // Professional Styled Header Banner
-            doc.setFillColor(30, 41, 59); // Deep Slate Gray
-            doc.rect(0, 0, 210, 40, 'F');
-            
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(20);
-            doc.text("COPROPRIETE ANDALOUS AL RAHMA 4", 20, 18);
-            
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("Groupe 4 - Immeuble 4, Madinat Arrahma, Casablanca", 20, 25);
-            doc.text(`Rapport Général d'exercice édité le : ${new Date().toLocaleDateString('fr-FR')}`, 20, 32);
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 30, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.setFont("Helvetica", "bold");
+            doc.text("COPROPRIETE ANDALOUS AL RAHMA 4 - RAPPORT DIRECT", 15, 12);
+            doc.setFontSize(10); doc.setFont("Helvetica", "normal");
+            doc.text(`Immeuble 4 - Suivi Global d'Exercice | Date d'exportation: ${new Date().toLocaleDateString('fr-FR')}`, 15, 22);
 
-            // Subtitle Title
-            doc.setTextColor(30, 41, 59);
-            doc.setFontSize(14);
-            doc.setFont("Helvetica", "bold");
-            doc.text("1. Récapitulatif Global des Cotisations d'Appartements", 15, 52);
+            doc.setTextColor(15, 23, 42); doc.setFontSize(12); doc.setFont("Helvetica", "bold");
+            doc.text("1. MATRICE COMPTABLE DES COTISATIONS (50.00 DH / MOIS)", 15, 42);
 
-            // Parse Incomes Rows to Table Format
-            let incRows = [];
-            db.incomes.forEach(i => {
-                incRows.push([`Appartement ${i.appNum}`, i.year, i.months.join(', '), `${i.total} DH`]);
-            });
-            if(incRows.length === 0) incRows = [["Aucune donnée enregistrée","","",""]];
+            let pdfHeaders = ["Appt", ...MONTHS.map(m=>m.substring(0,4)+'.'), "Total"];
+            let pdfRows = [];
+
+            for(let app = 1; app <= 25; app++) {
+                let row = [`Appt ${app}`];
+                let match = db.incomes.find(i => i.appNum === app);
+                let t = 0;
+                MONTHS.forEach(m => {
+                    if(match && match.payed.includes(m)) { row.push("50.00"); t += 50; }
+                    else if(match && match.nonPayed.includes(m)) { row.push("N.C"); }
+                    else { row.push("0.00"); }
+                });
+                row.push(`${t.toFixed(2)} DH`);
+                pdfRows.push(row);
+            }
 
             doc.autoTable({
-                startY: 57,
-                head: [['Identifiant Unité', 'Année', 'Mois payés', 'Montant Cotisé']],
-                body: incRows,
-                headStyles: { fillCountry: true, fillColor: [37, 99, 235] },
-                theme: 'striped'
-            });
-
-            // Add Next Section Page/Flow
-            let finalY = doc.lastAutoTable.finalY + 15;
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text("2. État Général des Dépenses de la Copropriété", 15, finalY);
-
-            let expRows = [];
-            db.expenses.forEach(e => {
-                let srvs = `Elec: ${e.services.elec} | Nettoyage: ${e.services.clean} | Matériel: ${e.services.products} | Ext: ${e.services.exterior}`;
-                let spec = `${e.special.amt} DH (${e.special.type})`;
-                expRows.push([`${e.month} ${e.year}`, srvs, spec, `${e.total} DH`]);
-            });
-            if(expRows.length === 0) expRows = [["Aucune dépense enregistrée","","",""]];
-
-            doc.autoTable({
-                startY: finalY + 5,
-                head: [['Période', 'Détails des Frais Fixes', 'Frais Exceptionnels', 'Total Décaissé']],
-                body: expRows,
-                headStyles: { fillCountry: true, fillColor: [225, 29, 72] },
+                startY: 47,
+                head: [pdfHeaders],
+                body: pdfRows,
+                styles: { fontSize: 8, cellPadding: 1.5 },
+                headStyles: { fillColor: [37, 99, 235] },
                 theme: 'grid'
             });
 
-            // Footer Signatures Box
-            let footerY = doc.lastAutoTable.finalY + 20;
-            if(footerY > 260) { doc.addPage(); footerY = 30; }
-            doc.line(15, footerY, 195, footerY);
-            doc.setFontSize(9);
-            doc.setFont("Helvetica", "italic");
-            doc.text("Visa du Gestionnaire de Copropriété (asaber)", 15, footerY + 8);
-            doc.text("Cachet et signature", 150, footerY + 8);
-
-            doc.save("Rapport_Syndic_Andalous_Rahma_4.pdf");
+            doc.save("Comptabilite_Andalous_Al_Rahma_4.pdf");
         }
     </script>
 </body>
