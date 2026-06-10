@@ -55,7 +55,7 @@
 
         <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
             
-            <!-- ================= TABLEAU DE BORD (Original Classic Layout) ================= -->
+            <!-- ================= TABLEAU DE BORD ================= -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -90,29 +90,29 @@
                 <button onclick="generatePDFReport()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm"><i class="fa-solid fa-file-pdf mr-1.5"></i>Générer PDF Pro</button>
             </div>
 
-            <!-- ================= PAGE 1 : COTISATIONS (Multi-Select Dots Form) ================= -->
+            <!-- ================= PAGE 1 : COTISATIONS ================= -->
             <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden accordion-item" id="sec-cotisations">
                 <button onclick="toggleAccordion('sec-cotisations')" class="w-full flex items-center justify-between p-4 font-bold text-left bg-slate-50 hover:bg-slate-100/50 transition-colors text-slate-800 border-b border-slate-200">
-                    <span class="flex items-center text-sm"><i class="fa-solid fa-hand-holding-dollar text-emerald-600 mr-2"></i>PAGE I : Gestion des Cotisations (المداخيل المباشرة)</span>
+                    <span class="flex items-center text-sm"><i class="fa-solid fa-hand-holding-dollar text-emerald-600 mr-2"></i>PAGE I : Suivi des Cotisations</span>
                     <div class="flex items-center space-x-4" onclick="event.stopPropagation()">
                         <select id="matrix-year" class="text-xs bg-white border border-slate-300 rounded p-1 font-normal" onchange="renderIncomesTable(); updateStatsAndTables();">
-                            <option value="2024">2024</option><option value="2025">2025</option>
-                            <option value="2026" selected>2026</option><option value="2027">2027</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2027">2027</option>
                         </select>
                         <i class="fa-solid fa-chevron-down text-slate-400 btn-arrow"></i>
                     </div>
                 </button>
                 <div class="accordion-content bg-white p-4 space-y-4">
-                    <!-- Formulaire Compact de Saisie Rapide (Multi-select Dots) -->
                     <form id="income-form" onsubmit="saveIncome(event)" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                        <input type="hidden" id="income-edit-appt" value="-1">
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="w-48">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner l'Appartement</label>
                                 <select id="inc-appt" required class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none"></select>
                             </div>
                             <div class="flex-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner les mois payés (نقاط اختيار الشهور المستلمة)</label>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sélectionner les mois payés</label>
                                 <div class="flex flex-wrap gap-2 mt-1" id="dots-months-container"></div>
                             </div>
                             <div class="w-32 pt-5">
@@ -121,7 +121,6 @@
                         </div>
                     </form>
 
-                    <!-- Real-time View List Table -->
                     <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
                         <table class="w-full text-left border-collapse" id="table-incomes">
                             <thead class="bg-slate-100 font-bold border-b border-slate-200 text-slate-700 uppercase">
@@ -163,7 +162,6 @@
                         </div>
                     </form>
 
-                    <!-- Expenses Table -->
                     <div class="overflow-x-auto border border-slate-200 rounded-xl text-[11px]">
                         <table class="w-full text-left border-collapse" id="table-expenses">
                             <thead class="bg-slate-100 font-bold text-slate-700 uppercase">
@@ -210,7 +208,10 @@
             MONTHS.forEach(m => expM.innerHTML += `<option value="${m}">${m}</option>`);
 
             const expY = document.getElementById("exp-year");
-            [2024, 2025, 2026, 2027].forEach(y => expY.innerHTML += `<option value="${y}">${y}</option>`);
+            [2024, 2025, 2026, 2027].forEach(y => {
+                const selectedAttr = (y === 2026) ? "selected" : "";
+                expY.innerHTML += `<option value="${y}" ${selectedAttr}>${y}</option>`;
+            });
 
             const dotsContainer = document.getElementById("dots-months-container");
             MONTHS.forEach((m, idx) => {
@@ -262,12 +263,13 @@
             return { label: "0.00 DH", color: "text-amber-600 font-medium" };
         }
 
-        // --- PAGE I : INCOMES ---
+        // --- PAGE I : COTISATIONS (WITH NEXT APARTMENT JUMP) ---
         function saveIncome(e) {
             e.preventDefault();
             checkAndBuildYearDatabase();
             const yr = document.getElementById("matrix-year").value;
-            const appt = parseInt(document.getElementById("inc-appt").value);
+            const apptSelect = document.getElementById("inc-appt");
+            const currentAppt = parseInt(apptSelect.value);
             
             let selectedMonths = [];
             document.querySelectorAll(".form-dot-chk:checked").forEach(chk => {
@@ -280,19 +282,27 @@
 
             for(let mIdx=0; mIdx<12; mIdx++) {
                 if(selectedMonths.includes(mIdx)) {
-                    db.incomes[yr][appt][mIdx] = 50;
+                    db.incomes[yr][currentAppt][mIdx] = 50;
                 } else {
                     if(parseInt(yr) < currentYear || (parseInt(yr) === currentYear && mIdx <= currentMonthIdx)) {
-                        db.incomes[yr][appt][mIdx] = 0;
+                        db.incomes[yr][currentAppt][mIdx] = 0;
                     } else {
-                        db.incomes[yr][appt][mIdx] = null;
+                        db.incomes[yr][currentAppt][mIdx] = null;
                     }
                 }
             }
 
             updateStatsAndTables();
             renderIncomesTable();
-            document.getElementById("income-form").reset();
+            
+            // Clear current month checks
+            document.querySelectorAll(".form-dot-chk").forEach(chk => chk.checked = false);
+            document.getElementById("btn-sub-inc").innerHTML = '<i class="fa-solid fa-check mr-1"></i>Enregistrer';
+
+            // Smart Step Auto Jump to Next Apartment (1 to 25 loop rotation)
+            let nextAppt = currentAppt + 1;
+            if (nextAppt > 25) nextAppt = 1;
+            apptSelect.value = nextAppt;
         }
 
         function editIncome(appt) {
@@ -346,10 +356,11 @@
             }
         }
 
-        // --- PAGE II : EXPENSES ---
+        // --- PAGE II : EXPENSES (WITH NEXT MONTH JUMP) ---
         function saveExpense(e) {
             e.preventDefault();
-            const month = document.getElementById("exp-month").value;
+            const monthSelect = document.getElementById("exp-month");
+            const currentMonth = monthSelect.value;
             const year = parseInt(document.getElementById("exp-year").value);
             const editIdx = parseInt(document.getElementById("expense-edit-index").value);
 
@@ -364,14 +375,21 @@
             };
 
             let total = Object.values(services).reduce((a,b)=>a+b,0) + special.amt;
-            let record = { month, year, services, special, total };
+            let record = { month: currentMonth, year, services, special, total };
 
             if(editIdx === -1) db.expenses.push(record);
             else { db.expenses[editIdx] = record; document.getElementById("expense-edit-index").value = "-1"; }
             
             updateStatsAndTables();
             document.getElementById("expense-form").reset();
+            document.getElementById("exp-year").value = year; // Retain current operational year
             SERVICES_KEYS.forEach(s => document.getElementById(`amt-${s.id}`).disabled = true);
+
+            // Smart Auto Jump to Next Month sequentially 
+            let curIdx = MONTHS.indexOf(currentMonth);
+            let nextIdx = curIdx + 1;
+            if (nextIdx >= 12) nextIdx = 0;
+            monthSelect.value = MONTHS[nextIdx];
         }
 
         function editExpense(idx) {
@@ -392,7 +410,6 @@
 
         function deleteExpense(idx) { if(confirm("Supprimer ce frais ?")) { db.expenses.splice(idx, 1); updateStatsAndTables(); } }
 
-        // --- STATS REFRESH ---
         function updateStatsAndTables() {
             const yr = document.getElementById("matrix-year").value;
             let totalIn = 0;
@@ -408,7 +425,6 @@
             document.getElementById("dash-total-expenses").innerText = `${totalOut.toFixed(2)} DH`;
             document.getElementById("dash-balance").innerText = `${(totalIn - totalOut).toFixed(2)} DH`;
 
-            // Table Expenses Render
             const tbodyExp = document.querySelector("#table-expenses tbody");
             tbodyExp.innerHTML = "";
             db.expenses.filter(e => e.year == yr).forEach((e, idx) => {
@@ -443,12 +459,11 @@
         }
         function handleLogout() { document.getElementById("app-screen").classList.add("hidden"); document.getElementById("login-screen").classList.remove("hidden"); }
 
-        // ================= EXPORT SYSTEM (EXCEL FIX) =================
+        // ================= EXPORT SYSTEM =================
         function exportToExcel() {
             let wb = XLSX.utils.book_new();
             const yr = document.getElementById("matrix-year").value;
 
-            // Sheet 1: Incomes
             let aoaData = [
                 [`SOCIETE COPROPRIETE ANDALOUS AL RAHMA GR 4 IM 4 - ANNEE ${yr}`],
                 ["Appartement (A)", ...MONTHS, "Total Annuel (DH)"]
@@ -469,7 +484,6 @@
             aoaData.push(["Total Mensuel", ...monthlySums, monthlySums.reduce((a,b)=>a+b,0)]);
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoaData), "Cotisations");
 
-            // Sheet 2: Expenses (FIXED KEYS)
             let expRows = [["Mois", "Année", "Électricité", "Nettoyage", "Produits", "Balayage", "Montant Exceptionnel", "Nature Frais", "Total Mensuel (DH)"]];
             db.expenses.filter(e => e.year == yr).forEach(e => {
                 expRows.push([
@@ -483,7 +497,7 @@
             XLSX.writeFile(wb, `Registre_Syndic_Andalous4_${yr}.xlsx`);
         }
 
-        // ================= IMPORT SYSTEM (FULL RESTORATION FIX) =================
+        // ================= IMPORT SYSTEM =================
         function importFromExcel(e) {
             let file = e.target.files[0]; if (!file) return;
             let reader = new FileReader(); reader.readAsArrayBuffer(file);
@@ -495,7 +509,6 @@
                     const yr = document.getElementById("matrix-year").value;
                     if(!db.incomes[yr]) db.incomes[yr] = {};
 
-                    // Read Sheet 1 (Incomes)
                     let sheet1 = workbook.Sheets["Cotisations"];
                     if(sheet1) {
                         let rows = XLSX.utils.sheet_to_json(sheet1, { header: 1 });
@@ -513,11 +526,10 @@
                         }
                     }
 
-                    // Read Sheet 2 (Expenses Restoration)
                     let sheet2 = workbook.Sheets["Dépenses"];
                     if(sheet2) {
                         let rows = XLSX.utils.sheet_to_json(sheet2, { header: 1 });
-                        db.expenses = db.expenses.filter(e => e.year != yr); // Clear dynamic current year block
+                        db.expenses = db.expenses.filter(e => e.year != yr);
                         for(let i=1; i<rows.length; i++) {
                             let r = rows[i]; if(!r || !r[0]) continue;
                             db.expenses.push({
@@ -530,18 +542,18 @@
 
                     renderIncomesTable(); 
                     updateStatsAndTables(); 
-                    alert("Base de données synchronisée (Madahel & Masarif) !");
+                    alert("Base de données synchronisée !");
                 } catch(err) { alert("Format invalide."); }
             };
         }
 
-        // ================= PDF REPORT GENERATOR =================
+        // ================= PDF REPORT GENERATOR (DETAILED EXPENSES EXCLUSION) =================
         function generatePDFReport() {
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF('l', 'mm', 'a4'); 
             const yr = document.getElementById("matrix-year").value;
 
-            // Page I : Incomes Spreadsheet
+            // PAGE I: Incomes Spreadsheet Matrix
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(12); doc.setFont("Helvetica", "bold");
             doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
@@ -595,25 +607,67 @@
                 }
             });
 
-            // Page II : Expenses Spreadsheet
+            // PAGE II: FIXED AND EXTENDED EXPENSES SPREADSHEET (HIGHLY DETAILED)
             doc.addPage();
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, 297, 18, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(12);
             doc.text(`ANDALOUS AL RAHMA 4 - CAISSE DU SYNDIC (ANNEE ${yr})`, 12, 11);
             
             doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-            doc.text("PAGE II : REGISTRE DE COMPTABILITE DES CHARGES & DEPENSES EFFECTIVES (MASARIF)", 12, 26);
+            doc.text("PAGE II : VENTILATION ANALYTIQUE ET AUDIT DES CHARGES PAR NATURE DE SERVICE (MASARIF)", 12, 26);
 
-            let expRows = db.expenses.filter(e => e.year == yr).map(e => {
-                let details = `Électricité: ${e.services.elec || 0}DH | Prods: ${e.services.prod || 0}DH | Nettoyage: ${e.services.clean || 0}DH | Balayage: ${e.services.ext || 0}DH`;
-                return [`${e.month} ${e.year}`, details, `${e.special.amt || 0} DH (${e.special.type || '-'})`, `${e.total.toFixed(2)} DH`];
+            // Re-engineering header to present isolated distinct column tracks
+            let expHeaders = ["Période", "Électricité (DH)", "Nettoyage (DH)", "Produits (DH)", "Balayage (DH)", "Exceptionnel (DH)", "Nature Charge Spec.", "Total Mensuel"];
+            
+            let filteredExp = db.expenses.filter(e => e.year == yr);
+            let totalFixedSums = { elec:0, clean:0, prod:0, ext:0, spec:0 };
+
+            let expRows = filteredExp.map(e => {
+                totalFixedSums.elec += (e.services.elec || 0);
+                totalFixedSums.clean += (e.services.clean || 0);
+                totalFixedSums.prod += (e.services.prod || 0);
+                totalFixedSums.ext += (e.services.ext || 0);
+                totalFixedSums.spec += (e.special.amt || 0);
+
+                return [
+                    `${e.month} ${e.year}`,
+                    (e.services.elec || 0).toFixed(2),
+                    (e.services.clean || 0).toFixed(2),
+                    (e.services.prod || 0).toFixed(2),
+                    (e.services.ext || 0).toFixed(2),
+                    (e.special.amt || 0).toFixed(2),
+                    e.special.type || "-",
+                    `${e.total.toFixed(2)} DH`
+                ];
             });
+
+            // Add comprehensive structural bottom totals line calculations context
+            let overallExpensesSum = Object.values(totalFixedSums).reduce((a,b)=>a+b,0);
+            expRows.push([
+                "Total Cumulé",
+                totalFixedSums.elec.toFixed(2),
+                totalFixedSums.clean.toFixed(2),
+                totalFixedSums.prod.toFixed(2),
+                totalFixedSums.ext.toFixed(2),
+                totalFixedSums.spec.toFixed(2),
+                "Audit global",
+                `${overallExpensesSum.toFixed(2)} DH`
+            ]);
 
             doc.autoTable({
                 startY: 30,
-                head: [['Période Comptable', 'Ventilation Charges Fixes', 'Frais Exceptionnels (Nature)', 'Total Dépensé (DH)']],
-                body: expRows.length > 0 ? expRows : [["Aucun frais enregistré pour cette année", "-", "-", "0.00 DH"]],
-                headStyles: { fillColor: [225, 29, 72] }, theme: 'striped'
+                head: [expHeaders],
+                body: expRows.length > 1 ? expRows : [["Aucune charge comptabilisée pour cet exercice", "0.00", "0.00", "0.00", "0.00", "0.00", "-", "0.00 DH"]],
+                headStyles: { fillColor: [225, 29, 72] }, 
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2, alignment: 'center' },
+                didParseCell: function(data) {
+                    if (data.row.index === expRows.length - 1) {
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.fillColor = [254, 242, 242]; // Light rose background accent line tracking metrics
+                        data.cell.styles.textColor = [153, 27, 27];
+                    }
+                }
             });
 
             doc.save(`Rapport_Syndic_Andalous4_${yr}.pdf`);
